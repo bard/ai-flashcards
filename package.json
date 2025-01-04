@@ -1,0 +1,58 @@
+{
+  "name": "intuicards",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "biome lint --error-on-warnings ./src",
+    "format": "prettier --write",
+    "test": "vitest run --coverage",
+    "build": "tsc",
+    "test:watch": "vitest watch --reporter=dot",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
+    "start:playwright": "docker run --name playwright-server -p 4000:4000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.49.1-noble /bin/sh -c \"npx -y playwright@1.49.1 run-server --port 4000 --host 0.0.0.0\"",
+    "stop:playwright": "docker kill playwright-server",
+    "build-database": "tsx src/build-database.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@tsconfig/node18": "^18.2.4",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^22.10.5",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-vitest": "^0.3.26",
+    "lefthook": "^1.10.1",
+    "prettier": "^3.4.2",
+    "ts-unused-exports": "^10.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cheerio": "^1.0.0",
+    "debug": "^4.4.0",
+    "dotenv-flow": "^4.1.0",
+    "kysely": "^0.26.3",
+    "openai": "^4.77.3",
+    "pino": "^8.21.0",
+    "pino-pretty": "^10.3.1",
+    "playwright": "^1.49.1",
+    "ts-custom-error": "^3.3.1",
+    "ts-essentials": "^9.4.2",
+    "uuid": "^9.0.1",
+    "zod": "^3.24.1"
+  }
+}

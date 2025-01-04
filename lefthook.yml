@@ -1,0 +1,26 @@
+pre-commit:
+  commands:
+    format:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: node --run format -- {staged_files}
+      stage_fixed: true
+    lint:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: node --run lint -- --staged
+      stage_fixed: true
+    typecheck:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: node --run typecheck
+    test:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: node --run test -- --bail=1 --reporter=basic
+
+pre-push:
+  parallel: true
+  commands:
+    typecheck:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: node --run typecheck
+    test:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: node --run test -- --bail=1 --reporter=basic

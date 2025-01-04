@@ -1,0 +1,28 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "formatter": { "enabled": false },
+  "organizeImports": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "ignore": ["coverage", "playwright-report", "dist"],
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "off"
+      },
+      "complexity": {
+        "useLiteralKeys": "off",
+        "useArrowFunction": "off"
+      },
+      "style": {
+        "noUselessElse": "off",
+        "useTemplate": "off",
+        "noUnusedTemplateLiteral": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      }
+    }
+  }
+}

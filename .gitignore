@@ -1,0 +1,10 @@
+node_modules
+.eslintcache
+.env
+.env*.local
+/.project
+dist
+.log
+/coverage
+.aider*
+data.db
