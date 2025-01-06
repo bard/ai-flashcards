@@ -2,6 +2,7 @@ import { test, expect } from "vitest";
 import { generateQuestionAnswerPair } from "./query.js";
 import type { Service } from "./types.js";
 
+// move to etl.test.ts ai!
 test("generate question/answer pair from service description", async () => {
   const service: Service = {
     name: "Sketch2Photo AI",
