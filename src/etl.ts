@@ -164,11 +164,15 @@ export const createOrUpdateDatabase = async (
     .all(...serviceUrls)
     .map((record) => z.object({ url: z.string() }).parse(record))
     .map((service) => service.url);
+
+  if (existingServicesUrls.length > 0) {
+    deps.logger?.info(
+      `information for ${existingServicesUrls.length} already exists in database, not scraping`,
+    );
+  }
   const newServices = services.filter(
     (service) => !existingServicesUrls.includes(service.url),
   );
-
-  deps.logger?.info(`scraping the following services: ${serviceUrls}`);
 
   let scrapesLeft = maxServicesToScrape;
   for (const service of newServices) {
