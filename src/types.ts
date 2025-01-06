@@ -1,9 +1,5 @@
-export interface ServiceLink {
-  name: string;
-  href: string;
-}
-
 export interface ServiceDescription {
+  name: string;
   descriptions: string[];
   tags: string[];
 }
@@ -14,7 +10,7 @@ export interface ServiceFeatures {
   fields: string[];
 }
 
-export type Service = ServiceLink & ServiceDescription & ServiceFeatures;
+export type Service = ServiceDescription & ServiceFeatures & { url: string };
 
 export interface QuestionAnswerPair {
   question: string;

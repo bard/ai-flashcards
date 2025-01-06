@@ -3,7 +3,6 @@ import type { OpenAI } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import * as cheerio from "cheerio";
 import type {
-  ServiceLink,
   ServiceDescription,
   ServiceFeatures,
   Service,
@@ -15,6 +14,8 @@ export const extractTaaftServiceBasicInfo = async (
 ): Promise<ServiceDescription> => {
   const $ = cheerio.load(taaftServicePageContent);
 
+  const name = $(".title_inner").text();
+
   const description = $(".description").first().find("p").text().trim();
 
   const tags: string[] = [];
@@ -23,25 +24,24 @@ export const extractTaaftServiceBasicInfo = async (
     tags.push(tag);
   });
 
-  return { tags, descriptions: [description] };
+  return { name, tags, descriptions: [description] };
 };
 
-export const extractTaaftTrendingServices = (
+export const extractTaaftTrendingServicesHrefs = (
   taaftTrendingPageContent: string,
-): ServiceLink[] => {
+): string[] => {
   const $ = cheerio.load(taaftTrendingPageContent);
 
-  const services: ServiceLink[] = [];
+  const hrefs: string[] = [];
 
   $("a.ai_link").each((_, element) => {
-    const name = $(element).text();
     const href = $(element).attr("href");
-    if (name !== undefined && href !== undefined) {
-      services.push({ name, href });
+    if (href !== undefined) {
+      hrefs.push(href);
     }
   });
 
-  return services;
+  return hrefs;
 };
 
 export const extractServiceFeaturesWithLlm = async (

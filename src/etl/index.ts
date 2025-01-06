@@ -5,12 +5,11 @@ import { Kysely, SqliteDialect } from "kysely";
 import sqlite from "better-sqlite3";
 import { OpenAI } from "openai";
 import { fileURLToPath } from "node:url";
-import type { ServiceLink } from "../types.js";
 import type { Database } from "../db/schema.js";
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
-  extractTaaftTrendingServices,
+  extractTaaftTrendingServicesHrefs,
   generateQuestionAnswerPair,
 } from "./operations.js";
 import { fetchPageContentWithPlaywright } from "./util.js";
@@ -31,6 +30,7 @@ const main = async (): Promise<void> => {
     { maxServicesToScrape: 4 },
     { browser, db, openai, logger },
   );
+
   await browser.close();
 };
 
@@ -46,31 +46,34 @@ export const createOrUpdateDatabase = async (
   await ensureDatabaseTables(deps.db);
 
   deps.logger?.info("fetching trending services on theresanaiforthat.com");
-  const serviceLinks = extractTaaftTrendingServices(
+  const serviceUrls = extractTaaftTrendingServicesHrefs(
     await fetchPageContentWithPlaywright(deps.browser, TAAFT_TRENDING_PAGE_URL),
-  ).map((link) => ({
-    // ensure absolute url
-    ...link,
-    href: new URL(link.href, TAAFT_TRENDING_PAGE_URL).href,
-  }));
+  ).map(
+    (href) =>
+      // ensure url is absolute
+      new URL(href, TAAFT_TRENDING_PAGE_URL).href,
+  );
 
-  const newServiceLinks = await filterOutExistingServiceLinks(serviceLinks, {
-    db: deps.db,
-    logger: deps.logger,
-  });
+  const existingServiceUrls = (
+    await deps.db.selectFrom("services").select("url").execute()
+  ).map((r) => r.url);
 
-  for (const serviceLink of newServiceLinks.slice(0, maxServicesToScrape)) {
+  const serviceUrlsToScrape = serviceUrls
+    .filter((serviceHref) => !existingServiceUrls.includes(serviceHref))
+    .slice(0, maxServicesToScrape);
+
+  for (const serviceUrl of serviceUrlsToScrape) {
     // slow down to avoid abusing upstream
     await sleep(Math.floor(Math.random() * 2000) + 2000);
 
-    deps.logger?.info(`fetching information for ${serviceLink.href}`);
-    const { descriptions, tags } = await extractTaaftServiceBasicInfo(
-      await fetchPageContentWithPlaywright(deps.browser, serviceLink.href),
+    deps.logger?.info(`fetching information for ${serviceUrl}`);
+    const { name, descriptions, tags } = await extractTaaftServiceBasicInfo(
+      await fetchPageContentWithPlaywright(deps.browser, serviceUrl),
     );
 
-    deps.logger?.info(`extracting features for ${serviceLink.href}`);
+    deps.logger?.info(`extracting features for ${serviceUrl}`);
     const { goals, methods, fields } = await extractServiceFeaturesWithLlm(
-      { descriptions, tags },
+      { name, descriptions, tags },
       { openai: deps.openai },
     );
 
@@ -79,7 +82,8 @@ export const createOrUpdateDatabase = async (
       ["goals", "fields", "methods"].map(async (feature) => {
         const qaPair = await generateQuestionAnswerPair({
           service: {
-            ...serviceLink,
+            url: serviceUrl,
+            name,
             descriptions,
             tags,
             fields,
@@ -102,16 +106,9 @@ export const createOrUpdateDatabase = async (
       .insertInto("services")
       .values({
         id: serviceId,
-        url: serviceLink.href,
+        url: serviceUrl,
         data: JSON.stringify(
-          {
-            name: serviceLink.name,
-            descriptions,
-            tags,
-            fields,
-            goals,
-            methods,
-          },
+          { name, descriptions, tags, fields, goals, methods },
           null,
           2,
         ),
@@ -143,29 +140,6 @@ const ensureDatabaseTables = async (db: Kysely<Database>): Promise<void> => {
       "id",
     ])
     .execute();
-};
-
-const filterOutExistingServiceLinks = async (
-  serviceLinks: ServiceLink[],
-  deps: { db: Kysely<Database>; logger?: { info: (message: string) => void } },
-): Promise<ServiceLink[]> => {
-  const serviceUrls = serviceLinks.map((service) => service.href);
-  const existingServicesUrls = await deps.db
-    .selectFrom("services")
-    .select("url")
-    .where("url", "in", serviceUrls)
-    .execute()
-    .then((rows) => rows.map((row) => row.url));
-
-  if (existingServicesUrls.length > 0) {
-    deps.logger?.info(
-      `skipping fetching information for ${existingServicesUrls.length} services (already in db)`,
-    );
-  }
-  const newServices = serviceLinks.filter(
-    (service) => !existingServicesUrls.includes(service.href),
-  );
-  return newServices;
 };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

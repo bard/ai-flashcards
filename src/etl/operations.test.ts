@@ -2,7 +2,7 @@ import { test, expect, vi } from "vitest";
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
-  extractTaaftTrendingServices,
+  extractTaaftTrendingServicesHrefs,
   generateQuestionAnswerPair,
 } from "./operations.js";
 import type { Service } from "../types.js";
@@ -14,7 +14,7 @@ import {
 test("generate question/answer pair from service description", async () => {
   const service: Service = {
     name: "Sketch2Photo AI",
-    href: "https://sketch2photo.ai",
+    url: "https://sketch2photo.ai",
     descriptions: [
       "Turn you pet photos into cool disney-pixar animation like art or choose from many other styles. Then easily turn these images into personalised gifts for you, your friends or loved ones!",
     ],
@@ -54,6 +54,7 @@ test("extract semistructured service information from content of service page on
       "descriptions": [
         "Lensa is a mobile app that utilizes AI technology to create unique, customized avatars from selfies. This app is designed to be easy to use and provide a range of features to perfect images on the go. Lensa's Magic Avatars feature is one of the most advanced AI technologies available and generates avatars in various art styles from your selfies. All images are created by AI and the results have been seen to go viral on social media. Lensa provides a unique experience and is an example of how AI can be used to create stunning visuals. The app is available for download on both the App Store and Google Play, and all images created with the app are non-commercial and used solely as examples of what is possible with the technology.",
       ],
+      "name": "Magic Avatars",
       "tags": [
         "Avatar Creation",
         "Selfie Based",
@@ -69,30 +70,15 @@ test("extract semistructured service information from content of service page on
 test("extract list of trending services from content of taaft.com trending page", async () => {
   const content = await getTaaftTrendingPageMockContent();
 
-  const services = extractTaaftTrendingServices(content);
+  const services = extractTaaftTrendingServicesHrefs(content);
 
   expect(services.slice(0, 5)).toMatchInlineSnapshot(`
     [
-      {
-        "href": "/ai/magic-avatars/",
-        "name": "Magic Avatars",
-      },
-      {
-        "href": "/ai/goenhance/",
-        "name": "GoEnhance",
-      },
-      {
-        "href": "/ai/twain/",
-        "name": "Twain",
-      },
-      {
-        "href": "/ai/kaiber/",
-        "name": "Kaiber",
-      },
-      {
-        "href": "/ai/learn-earth/",
-        "name": "Learn Earth",
-      },
+      "/ai/magic-avatars/",
+      "/ai/goenhance/",
+      "/ai/twain/",
+      "/ai/kaiber/",
+      "/ai/learn-earth/",
     ]
   `);
 });
@@ -158,6 +144,7 @@ test("extract extended service info with mocked openai", async () => {
   };
 
   const semistructuredServiceInfo = {
+    name: "Mocked name",
     descriptions: ["Mocked description"],
     tags: ["Mocked tag"],
   };
