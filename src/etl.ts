@@ -118,12 +118,12 @@ export const buildServiceDatabase = async (
   }: { maxServices: number; onProgress?: (message: string) => void },
   deps: { browser: playwright.Browser; db: sqlite.Database; openai: OpenAI },
 ) => {
-  // add an id column of text type; it will not have a default value; it will be the primary key; the value will be filled by the application code with an uuid generated in typescript; make the url field unique; ai!
   deps.db
     .prepare(
       `
       CREATE TABLE IF NOT EXISTS services (
-        url TEXT PRIMARY KEY,
+        id TEXT PRIMARY KEY,
+        url TEXT UNIQUE,
         name TEXT,
         data TEXT
       );
