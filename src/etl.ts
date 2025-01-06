@@ -150,6 +150,7 @@ export const createOrUpdateDatabase = async (
     TAAFT_TRENDING_PAGE_URL,
   );
   const services = extractTaaftTrendingServices(taaftTrendingPageContent);
+  // query all services in the services table where the url is one of the url of the services object above; ai!
 
   let scrapesLeft = maxServices;
   for (const service of services) {
