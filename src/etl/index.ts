@@ -4,6 +4,7 @@ import { pino } from "pino";
 import playwright from "playwright";
 import sqlite from "better-sqlite3";
 import { OpenAI } from "openai";
+import { fileURLToPath } from "node:url";
 import type { ServiceLink } from "../types.js";
 import {
   extractServiceFeaturesWithLlm,
@@ -144,5 +145,6 @@ const filterOutExistingServiceLinks = (
   return newServices;
 };
 
-// only run this if script is imported directly ai!
-await main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  await main();
+}

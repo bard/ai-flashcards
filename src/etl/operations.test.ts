@@ -3,11 +3,11 @@ import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
   extractTaaftTrendingServices,
-} from "./etl.js";
+} from "./operations.js";
 import {
   getTaaftTrendingPageMockContent,
   getTaaftServicePageMockContent,
-} from "./etl.test.fixtures/index.js";
+} from "./operations.test.fixtures/index.js";
 
 test("extract semistructured service information from content of service page on taaft.com", async () => {
   const content = await getTaaftServicePageMockContent();
@@ -39,24 +39,24 @@ test("extract list of trending services from content of taaft.com trending page"
   expect(services.slice(0, 5)).toMatchInlineSnapshot(`
     [
       {
+        "href": "/ai/magic-avatars/",
         "name": "Magic Avatars",
-        "url": "https://theresanaiforthat.com/ai/magic-avatars/",
       },
       {
+        "href": "/ai/goenhance/",
         "name": "GoEnhance",
-        "url": "https://theresanaiforthat.com/ai/goenhance/",
       },
       {
+        "href": "/ai/twain/",
         "name": "Twain",
-        "url": "https://theresanaiforthat.com/ai/twain/",
       },
       {
+        "href": "/ai/kaiber/",
         "name": "Kaiber",
-        "url": "https://theresanaiforthat.com/ai/kaiber/",
       },
       {
+        "href": "/ai/learn-earth/",
         "name": "Learn Earth",
-        "url": "https://theresanaiforthat.com/ai/learn-earth/",
       },
     ]
   `);

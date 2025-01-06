@@ -1,6 +1,6 @@
 export interface ServiceLink {
   name: string;
-  url: string;
+  href: string;
 }
 
 export interface ServiceDescription {

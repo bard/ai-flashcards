@@ -5,7 +5,7 @@ import type { Service } from "./types.js";
 test("generate question/answer pair from service description", async () => {
   const service: Service = {
     name: "Sketch2Photo AI",
-    url: "https://sketch2photo.ai",
+    href: "https://sketch2photo.ai",
     descriptions: [
       "Turn you pet photos into cool disney-pixar animation like art or choose from many other styles. Then easily turn these images into personalised gifts for you, your friends or loved ones!",
     ],
