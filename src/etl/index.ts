@@ -87,6 +87,8 @@ export const createOrUpdateDatabase = async (
           2,
         ),
       );
+
+    // generate flashcards for this service using `generateQuestionAnswerPair` for each type of feature (goals, fields, methods) and add them to the flashcards table all together in a transaction ai!
   }
 };
 
