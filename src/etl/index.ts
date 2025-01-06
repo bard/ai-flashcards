@@ -151,16 +151,12 @@ const filterOutExistingServiceLinks = (
   deps: { db: Kysely<Database>; logger?: { info: (message: string) => void } },
 ): ServiceLink[] => {
   const serviceUrls = serviceLinks.map((service) => service.href);
-  // convert this to kysely syntax ai!
-  const existingServicesUrls = deps.db
-    .prepare(
-      `SELECT url FROM services WHERE url IN (${serviceUrls
-        .map(() => "?")
-        .join(", ")})`,
-    )
-    .all(...serviceUrls)
-    .map((record) => z.object({ url: z.string() }).parse(record))
-    .map((service) => service.url);
+  const existingServicesUrls = await deps.db
+    .selectFrom('services')
+    .select('url')
+    .where('url', 'in', serviceUrls)
+    .execute()
+    .then((rows) => rows.map((row) => row.url));
 
   if (existingServicesUrls.length > 0) {
     deps.logger?.info(
