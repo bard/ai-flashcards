@@ -111,14 +111,13 @@ export const extractExtendedServiceInfoWithLlm = async (
   }
 };
 
-// rename the log parameter to logger ai!
 export const createOrUpdateDatabase = async (
   { maxServicesToScrape }: { maxServicesToScrape: number },
   deps: {
     browser: playwright.Browser;
     db: sqlite.Database;
     openai: OpenAI;
-    log?: { info: (message: string) => void };
+    logger?: { info: (message: string) => void };
   },
 ) => {
   deps.db
@@ -148,7 +147,7 @@ export const createOrUpdateDatabase = async (
     )
     .run();
 
-  deps.log?.info("fetching theresanaiforthat.com trending page");
+  deps.logger?.info("fetching theresanaiforthat.com trending page");
   const taaftTrendingPageContent = await fetchPageContentWithPlaywright(
     deps.browser,
     TAAFT_TRENDING_PAGE_URL,
@@ -169,7 +168,7 @@ export const createOrUpdateDatabase = async (
     (service) => !existingServicesUrls.includes(service.url),
   );
 
-  deps.log?.info(`scraping the following services: ${serviceUrls}`);
+  deps.logger?.info(`scraping the following services: ${serviceUrls}`);
 
   let scrapesLeft = maxServicesToScrape;
   for (const service of newServices) {
@@ -177,7 +176,7 @@ export const createOrUpdateDatabase = async (
       break;
     }
 
-    deps.log?.info(`scraping: ${service.name} at ${service.url}`);
+    deps.logger?.info(`scraping: ${service.name} at ${service.url}`);
 
     const delay = Math.floor(Math.random() * 2000) + 2000;
     await new Promise((resolve) => setTimeout(resolve, delay));
