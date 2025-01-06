@@ -74,15 +74,23 @@ export const createOrUpdateDatabase = async (
         id,
         serviceLink.href,
         JSON.stringify(
-          { name: serviceLink.name, descriptions, tags, fields, goals, methods },
+          {
+            name: serviceLink.name,
+            descriptions,
+            tags,
+            fields,
+            goals,
+            methods,
+          },
           null,
-          2
+          2,
         ),
       );
   }
 };
 
 const ensureDatabaseTables = (db: sqlite.Database): void => {
+  // remove name column ai!
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS services (
