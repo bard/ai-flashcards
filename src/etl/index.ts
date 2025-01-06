@@ -69,13 +69,15 @@ export const createOrUpdateDatabase = async (
 
     const id = crypto.randomUUID();
     deps.db
-      .prepare("INSERT INTO services (id, name, url, data) VALUES (?, ?, ?, ?)")
+      .prepare("INSERT INTO services (id, url, data) VALUES (?, ?, ?)")
       .run(
         id,
-        // move servicelink name to data field ai!
-        serviceLink.name,
         serviceLink.href,
-        JSON.stringify({ descriptions, tags, fields, goals, methods }, null, 2),
+        JSON.stringify(
+          { name: serviceLink.name, descriptions, tags, fields, goals, methods },
+          null,
+          2
+        ),
       );
   }
 };
