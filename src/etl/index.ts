@@ -101,6 +101,8 @@ const ensureDatabaseTables = (db: sqlite.Database): void => {
   `,
   ).run();
 
+  // add a 'feature' column that indicates what feature of the service (e.g. goals, fields, methods) is the flashcard about . ai!
+
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS flashcards (
