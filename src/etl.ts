@@ -120,6 +120,7 @@ export const createOrUpdateDatabase = async (
     logger?: { info: (message: string) => void };
   },
 ) => {
+  // move table setup to a function named `ensureDatabaseTables` ai!
   deps.db
     .prepare(
       `
