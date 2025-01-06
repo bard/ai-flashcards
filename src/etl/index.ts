@@ -1,4 +1,3 @@
-import { z } from "zod";
 import sleep from "sleep-promise";
 import { pino, type Logger } from "pino";
 import playwright from "playwright";
@@ -7,7 +6,7 @@ import sqlite from "better-sqlite3";
 import { OpenAI } from "openai";
 import { fileURLToPath } from "node:url";
 import type { ServiceLink } from "../types.js";
-import type { Database } from "../db/schema";
+import type { Database } from "../db/schema.js";
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
@@ -44,7 +43,7 @@ export const createOrUpdateDatabase = async (
     logger?: Logger;
   },
 ): Promise<void> => {
-  ensureDatabaseTables(deps.db);
+  await ensureDatabaseTables(deps.db);
 
   deps.logger?.info("fetching trending services on theresanaiforthat.com");
   const serviceLinks = extractTaaftTrendingServices(
@@ -55,7 +54,7 @@ export const createOrUpdateDatabase = async (
     href: new URL(link.href, TAAFT_TRENDING_PAGE_URL).href,
   }));
 
-  const newServiceLinks = filterOutExistingServiceLinks(serviceLinks, {
+  const newServiceLinks = await filterOutExistingServiceLinks(serviceLinks, {
     db: deps.db,
     logger: deps.logger,
   });
@@ -146,15 +145,15 @@ const ensureDatabaseTables = async (db: Kysely<Database>): Promise<void> => {
     .execute();
 };
 
-const filterOutExistingServiceLinks = (
+const filterOutExistingServiceLinks = async (
   serviceLinks: ServiceLink[],
   deps: { db: Kysely<Database>; logger?: { info: (message: string) => void } },
-): ServiceLink[] => {
+): Promise<ServiceLink[]> => {
   const serviceUrls = serviceLinks.map((service) => service.href);
   const existingServicesUrls = await deps.db
-    .selectFrom('services')
-    .select('url')
-    .where('url', 'in', serviceUrls)
+    .selectFrom("services")
+    .select("url")
+    .where("url", "in", serviceUrls)
     .execute()
     .then((rows) => rows.map((row) => row.url));
 
