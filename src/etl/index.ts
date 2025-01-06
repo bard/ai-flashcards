@@ -14,7 +14,7 @@ import {
 
 const TAAFT_TRENDING_PAGE_URL = "https://theresanaiforthat.com/trending/";
 
-const main = async () => {
+const main = async (): Promise<void> => {
   const logger = pino();
   const openai = new OpenAI();
   const browser = await playwright.chromium.connect("ws://127.0.0.1:4000/");
@@ -34,7 +34,7 @@ export const createOrUpdateDatabase = async (
     openai: OpenAI;
     logger?: Logger;
   },
-) => {
+): Promise<void> => {
   ensureDatabaseTables(deps.db);
 
   deps.logger?.info("fetching trending services on theresanaiforthat.com");
