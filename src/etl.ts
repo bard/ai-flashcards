@@ -171,6 +171,7 @@ export const buildServiceDatabase = async (
     );
 
     deps.db
+      // generate the id (as uuid) and  insert it; ai!
       .prepare("INSERT INTO services (name, url, data) VALUES (?, ?, ?)")
       .run(
         service.name,
