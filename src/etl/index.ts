@@ -1,6 +1,6 @@
 import { z } from "zod";
 import sleep from "sleep-promise";
-import { pino } from "pino";
+import { pino, type Logger } from "pino";
 import playwright from "playwright";
 import sqlite from "better-sqlite3";
 import { OpenAI } from "openai";
@@ -32,7 +32,7 @@ export const createOrUpdateDatabase = async (
     browser: playwright.Browser;
     db: sqlite.Database;
     openai: OpenAI;
-    logger?: { info: (message: string) => void };
+    logger?: Logger;
   },
 ) => {
   ensureDatabaseTables(deps.db);
