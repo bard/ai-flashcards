@@ -221,6 +221,31 @@ export const createOrUpdateDatabase = async (
   }
 };
 
+const ensureDatabaseTables = (db: sqlite.Database) => {
+  db.prepare(
+    `
+    CREATE TABLE IF NOT EXISTS services (
+      id TEXT PRIMARY KEY,
+      url TEXT UNIQUE,
+      name TEXT,
+      data TEXT
+    );
+  `,
+  ).run();
+
+  db.prepare(
+    `
+    CREATE TABLE IF NOT EXISTS flashcards (
+      id TEXT PRIMARY KEY,
+      question TEXT,
+      answer TEXT,
+      service_id TEXT,
+      FOREIGN KEY(service_id) REFERENCES services(id)
+    );
+  `,
+  ).run();
+};
+
 const fetchPageContentWithPlaywright = async (
   browser: playwright.Browser,
   url: string,
