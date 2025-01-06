@@ -72,6 +72,7 @@ export const createOrUpdateDatabase = async (
       .prepare("INSERT INTO services (id, name, url, data) VALUES (?, ?, ?, ?)")
       .run(
         id,
+        // move servicelink name to data field ai!
         serviceLink.name,
         serviceLink.href,
         JSON.stringify({ descriptions, tags, fields, goals, methods }, null, 2),
