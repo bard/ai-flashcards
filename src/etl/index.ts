@@ -113,6 +113,8 @@ const ensureDatabaseTables = (db: sqlite.Database): void => {
   ).run();
 };
 
+// move to a new src/etl/util.ts module ai!
+
 const fetchPageContentWithPlaywright = async (
   browser: playwright.Browser,
   url: string,
