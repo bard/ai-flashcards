@@ -131,6 +131,8 @@ export const buildServiceDatabase = async (
     )
     .run();
 
+  // create another table (if it doesn't exist) named 'flashcards', with each record being a question/answer pair; it should have a service_id foreign key to point to a record from the services table; it should have a text id primary key; ai!
+
   const taaftTrendingPageContent = await fetchPageContentWithPlaywright(
     deps.browser,
     TAAFT_TRENDING_PAGE_URL,
