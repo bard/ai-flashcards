@@ -90,13 +90,11 @@ export const createOrUpdateDatabase = async (
 };
 
 const ensureDatabaseTables = (db: sqlite.Database): void => {
-  // remove name column ai!
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS services (
       id TEXT PRIMARY KEY,
       url TEXT UNIQUE,
-      name TEXT,
       data TEXT
     );
   `,
