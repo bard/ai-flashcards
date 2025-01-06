@@ -111,7 +111,7 @@ export const extractExtendedServiceInfoWithLlm = async (
   }
 };
 
-export const buildServiceDatabase = async (
+export const createOrUpdateDatabase = async (
   {
     maxServices,
     onProgress,
@@ -149,10 +149,9 @@ export const buildServiceDatabase = async (
     deps.browser,
     TAAFT_TRENDING_PAGE_URL,
   );
-
   const services = extractTaaftTrendingServices(taaftTrendingPageContent);
-  let scrapesLeft = maxServices;
 
+  let scrapesLeft = maxServices;
   for (const service of services) {
     if (scrapesLeft === 0) {
       break;
