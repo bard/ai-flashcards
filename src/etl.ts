@@ -150,7 +150,19 @@ export const createOrUpdateDatabase = async (
     TAAFT_TRENDING_PAGE_URL,
   );
   const services = extractTaaftTrendingServices(taaftTrendingPageContent);
-  // query all services in the services table where the url is one of the url of the services object above; ai!
+
+  const serviceUrls = services.map((service) => service.url);
+  const existingServices = deps.db
+    .prepare(
+      `SELECT url FROM services WHERE url IN (${serviceUrls
+        .map(() => "?")
+        .join(", ")})`,
+    )
+    .all(...serviceUrls);
+
+  const existingServiceUrls = new Set(
+    existingServices.map((service) => service.url),
+  );
 
   let scrapesLeft = maxServices;
   for (const service of services) {
