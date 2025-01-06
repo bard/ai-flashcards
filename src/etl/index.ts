@@ -2,12 +2,12 @@ import { z } from "zod";
 import sleep from "sleep-promise";
 import { pino, type Logger } from "pino";
 import playwright from "playwright";
-import { Kysely, SqliteDialect } from 'kysely';
-import sqlite3 from 'sqlite3';
+import { Kysely, SqliteDialect } from "kysely";
+import sqlite from "better-sqlite3";
 import { OpenAI } from "openai";
 import { fileURLToPath } from "node:url";
 import type { ServiceLink } from "../types.js";
-import { Database } from '../db/schema';
+import type { Database } from "../db/schema";
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
@@ -18,16 +18,16 @@ import { fetchPageContentWithPlaywright } from "./util.js";
 
 const TAAFT_TRENDING_PAGE_URL = "https://theresanaiforthat.com/trending/";
 
-const db = new Kysely<Database>({
-  dialect: new SqliteDialect({
-    database: new sqlite3.Database('data.db'),
-  }),
-});
-
 const main = async (): Promise<void> => {
   const logger = pino();
   const openai = new OpenAI();
   const browser = await playwright.chromium.connect("ws://127.0.0.1:4000/");
+  const db = new Kysely<Database>({
+    dialect: new SqliteDialect({
+      database: new sqlite("data.db"),
+    }),
+  });
+
   await createOrUpdateDatabase(
     { maxServicesToScrape: 4 },
     { browser, db, openai, logger },
@@ -39,7 +39,7 @@ export const createOrUpdateDatabase = async (
   { maxServicesToScrape }: { maxServicesToScrape: number },
   deps: {
     browser: playwright.Browser;
-    db: sqlite.Database;
+    db: Kysely<Database>;
     openai: OpenAI;
     logger?: Logger;
   },
@@ -99,45 +99,59 @@ export const createOrUpdateDatabase = async (
       }),
     );
 
-    await insertService(serviceId, serviceLink, JSON.stringify({
-      name: serviceLink.name,
-      descriptions,
-      tags,
-      fields,
-      goals,
-      methods,
-    }, null, 2));
+    await deps.db
+      .insertInto("services")
+      .values({
+        id: serviceId,
+        url: serviceLink.href,
+        data: JSON.stringify(
+          {
+            name: serviceLink.name,
+            descriptions,
+            tags,
+            fields,
+            goals,
+            methods,
+          },
+          null,
+          2,
+        ),
+      })
+      .execute();
 
-    await insertFlashcards(flashcards);
+    await deps.db.insertInto("flashcards").values(flashcards).execute();
   }
 };
 
-const ensureDatabaseTables = async (): Promise<void> => {
+const ensureDatabaseTables = async (db: Kysely<Database>): Promise<void> => {
   await db.schema
-    .createTable('services')
+    .createTable("services")
     .ifNotExists()
-    .addColumn('id', 'text', (col) => col.primaryKey())
-    .addColumn('url', 'text', (col) => col.unique())
-    .addColumn('data', 'text')
+    .addColumn("id", "text", (col) => col.primaryKey())
+    .addColumn("url", "text", (col) => col.unique())
+    .addColumn("data", "text")
     .execute();
 
   await db.schema
-    .createTable('flashcards')
+    .createTable("flashcards")
     .ifNotExists()
-    .addColumn('id', 'text', (col) => col.primaryKey())
-    .addColumn('question', 'text')
-    .addColumn('answer', 'text')
-    .addColumn('feature', 'text')
-    .addColumn('service_id', 'text')
-    .addForeignKeyConstraint('fk_service_id', ['service_id'], 'services', ['id'])
+    .addColumn("id", "text", (col) => col.primaryKey())
+    .addColumn("question", "text")
+    .addColumn("answer", "text")
+    .addColumn("feature", "text")
+    .addColumn("service_id", "text")
+    .addForeignKeyConstraint("fk_service_id", ["service_id"], "services", [
+      "id",
+    ])
     .execute();
 };
 
 const filterOutExistingServiceLinks = (
   serviceLinks: ServiceLink[],
-  deps: { db: sqlite.Database; logger?: { info: (message: string) => void } },
+  deps: { db: Kysely<Database>; logger?: { info: (message: string) => void } },
 ): ServiceLink[] => {
   const serviceUrls = serviceLinks.map((service) => service.href);
+  // convert this to kysely syntax ai!
   const existingServicesUrls = deps.db
     .prepare(
       `SELECT url FROM services WHERE url IN (${serviceUrls
@@ -159,17 +173,6 @@ const filterOutExistingServiceLinks = (
   return newServices;
 };
 
-const insertService = async (serviceId: string, serviceLink: ServiceLink, data: string) => {
-  await db.insertInto('services').values({
-    id: serviceId,
-    url: serviceLink.href,
-    data,
-  }).execute();
-};
-
-const insertFlashcards = async (flashcards: FlashcardsTable[]) => {
-  await db.insertInto('flashcards').values(flashcards).execute();
-};
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   await main();
-  await db.destroy();
 }
