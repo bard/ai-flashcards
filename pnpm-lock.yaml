@@ -35,6 +35,9 @@ importers:
       playwright:
         specifier: ^1.49.1
         version: 1.49.1
+      sleep-promise:
+        specifier: ^9.1.0
+        version: 9.1.0
       ts-custom-error:
         specifier: ^3.3.1
         version: 3.3.1
@@ -2134,6 +2137,9 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  sleep-promise@9.1.0:
+    resolution: {integrity: sha512-UHYzVpz9Xn8b+jikYSD6bqvf754xL2uBUzDFwiU6NcdZeifPr6UfgU43xpkPu67VMS88+TI2PSI7Eohgqf2fKA==}
 
   sonic-boom@3.8.1:
     resolution: {integrity: sha512-y4Z8LCDBuum+PBP3lSV7RHrXscqksve/bi0as7mhwVnBW+/wUqKT/2Kb7um8yqcFy0duYbbPxzt89Zy2nOCaxg==}
@@ -4589,6 +4595,8 @@ snapshots:
       simple-concat: 1.0.1
 
   slash@3.0.0: {}
+
+  sleep-promise@9.1.0: {}
 
   sonic-boom@3.8.1:
     dependencies:

@@ -1,0 +1,2 @@
+- specify return type in function declarations
+- prefer const format for defining functions

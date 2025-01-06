@@ -1,4 +1,5 @@
 import { z } from "zod";
+import sleep from "sleep-promise";
 import type { OpenAI } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type sqlite from "better-sqlite3";
@@ -12,7 +13,7 @@ import type {
 
 const TAAFT_TRENDING_PAGE_URL = "https://theresanaiforthat.com/trending/";
 
-export const extractTaaftServiceInformation = async (
+export const extractTaaftServiceBasicInfo = async (
   taaftServicePageContent: string,
 ): Promise<ServiceDescription> => {
   const $ = cheerio.load(taaftServicePageContent);
@@ -49,7 +50,7 @@ export const extractTaaftTrendingServices = (
   return services;
 };
 
-export const extractExtendedServiceInfoWithLlm = async (
+export const extractServiceFeaturesWithLlm = async (
   unstructuredServiceInfo: ServiceDescription,
   deps: { openai: OpenAI },
 ): Promise<ServiceFeatures> => {
@@ -122,52 +123,29 @@ export const createOrUpdateDatabase = async (
 ) => {
   ensureDatabaseTables(deps.db);
 
-  deps.logger?.info("fetching theresanaiforthat.com trending page");
-  const taaftTrendingPageContent = await fetchPageContentWithPlaywright(
-    deps.browser,
-    TAAFT_TRENDING_PAGE_URL,
+  deps.logger?.info("fetching trending services on theresanaiforthat.com");
+  const serviceLinks = extractTaaftTrendingServices(
+    await fetchPageContentWithPlaywright(deps.browser, TAAFT_TRENDING_PAGE_URL),
   );
-  const services = extractTaaftTrendingServices(taaftTrendingPageContent);
 
-  const serviceUrls = services.map((service) => service.url);
-  const existingServicesUrls = deps.db
-    .prepare(
-      `SELECT url FROM services WHERE url IN (${serviceUrls
-        .map(() => "?")
-        .join(", ")})`,
-    )
-    .all(...serviceUrls)
-    .map((record) => z.object({ url: z.string() }).parse(record))
-    .map((service) => service.url);
+  const newServiceLinks = filterOutExistingServiceLinks(serviceLinks, {
+    db: deps.db,
+    logger: deps.logger,
+  });
 
-  if (existingServicesUrls.length > 0) {
+  for (const serviceLink of newServiceLinks.slice(0, maxServicesToScrape)) {
     deps.logger?.info(
-      `information for ${existingServicesUrls.length} already exists in database, not scraping`,
+      `fetching and extracting information for ${serviceLink.url}`,
     );
-  }
-  const newServices = services.filter(
-    (service) => !existingServicesUrls.includes(service.url),
-  );
 
-  let scrapesLeft = maxServicesToScrape;
-  for (const service of newServices) {
-    if (scrapesLeft === 0) {
-      break;
-    }
+    // slow down to avoid abusing upstream
+    await sleep(Math.floor(Math.random() * 2000) + 2000);
 
-    deps.logger?.info(`scraping: ${service.name} at ${service.url}`);
-
-    const delay = Math.floor(Math.random() * 2000) + 2000;
-    await new Promise((resolve) => setTimeout(resolve, delay));
-
-    const servicePageContent = await fetchPageContentWithPlaywright(
-      deps.browser,
-      service.url,
+    const { descriptions, tags } = await extractTaaftServiceBasicInfo(
+      await fetchPageContentWithPlaywright(deps.browser, serviceLink.url),
     );
-    const unstructuredInfo =
-      await extractTaaftServiceInformation(servicePageContent);
-    const structuredInfo = await extractExtendedServiceInfoWithLlm(
-      unstructuredInfo,
+    const { goals, methods, fields } = await extractServiceFeaturesWithLlm(
+      { descriptions, tags },
       { openai: deps.openai },
     );
 
@@ -176,26 +154,14 @@ export const createOrUpdateDatabase = async (
       .prepare("INSERT INTO services (id, name, url, data) VALUES (?, ?, ?, ?)")
       .run(
         id,
-        service.name,
-        service.url,
-        JSON.stringify(
-          {
-            descriptions: unstructuredInfo.descriptions,
-            tags: unstructuredInfo.tags,
-            fields: structuredInfo.fields,
-            goals: structuredInfo.goals,
-            methods: structuredInfo.methods,
-          },
-          null,
-          2,
-        ),
+        serviceLink.name,
+        serviceLink.url,
+        JSON.stringify({ descriptions, tags, fields, goals, methods }, null, 2),
       );
-
-    scrapesLeft--;
   }
 };
 
-const ensureDatabaseTables = (db: sqlite.Database) => {
+const ensureDatabaseTables = (db: sqlite.Database): void => {
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS services (
@@ -233,4 +199,30 @@ const fetchPageContentWithPlaywright = async (
   await page.goto(url, { waitUntil: "domcontentloaded" });
   const content = await page.content();
   return content;
+};
+
+const filterOutExistingServiceLinks = (
+  serviceLinks: ServiceLink[],
+  deps: { db: sqlite.Database; logger?: { info: (message: string) => void } },
+): ServiceLink[] => {
+  const serviceUrls = serviceLinks.map((service) => service.url);
+  const existingServicesUrls = deps.db
+    .prepare(
+      `SELECT url FROM services WHERE url IN (${serviceUrls
+        .map(() => "?")
+        .join(", ")})`,
+    )
+    .all(...serviceUrls)
+    .map((record) => z.object({ url: z.string() }).parse(record))
+    .map((service) => service.url);
+
+  if (existingServicesUrls.length > 0) {
+    deps.logger?.info(
+      `information for ${existingServicesUrls.length} already exists in database, not scraping`,
+    );
+  }
+  const newServices = serviceLinks.filter(
+    (service) => !existingServicesUrls.includes(service.url),
+  );
+  return newServices;
 };

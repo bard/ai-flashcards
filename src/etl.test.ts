@@ -1,7 +1,7 @@
 import { test, expect, vi } from "vitest";
 import {
-  extractExtendedServiceInfoWithLlm,
-  extractTaaftServiceInformation,
+  extractServiceFeaturesWithLlm,
+  extractTaaftServiceBasicInfo,
   extractTaaftTrendingServices,
 } from "./etl.js";
 import {
@@ -12,7 +12,7 @@ import {
 test("extract semistructured service information from content of service page on taaft.com", async () => {
   const content = await getTaaftServicePageMockContent();
 
-  const serviceInfo = await extractTaaftServiceInformation(content);
+  const serviceInfo = await extractTaaftServiceBasicInfo(content);
 
   expect(serviceInfo).toMatchInlineSnapshot(`
     {
@@ -127,7 +127,7 @@ test("extract extended service info with mocked openai", async () => {
     tags: ["Mocked tag"],
   };
 
-  const serviceInfo = await extractExtendedServiceInfoWithLlm(
+  const serviceInfo = await extractServiceFeaturesWithLlm(
     semistructuredServiceInfo,
     { openai: mockOpenai as any },
   );

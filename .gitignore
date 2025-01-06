@@ -7,4 +7,5 @@ dist
 .log
 /coverage
 .aider*
+!.aider.conf.yml
 data.db
