@@ -111,6 +111,7 @@ export const extractExtendedServiceInfoWithLlm = async (
   }
 };
 
+// replace onProgress with an optional log object (from pino log) and move it to the deps parameter; ai!
 export const createOrUpdateDatabase = async (
   {
     maxServicesToScrape,
