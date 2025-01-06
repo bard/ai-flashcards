@@ -111,6 +111,7 @@ export const extractExtendedServiceInfoWithLlm = async (
   }
 };
 
+// rename the log parameter to logger ai!
 export const createOrUpdateDatabase = async (
   { maxServicesToScrape }: { maxServicesToScrape: number },
   deps: {
