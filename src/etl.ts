@@ -170,10 +170,11 @@ export const buildServiceDatabase = async (
       { openai: deps.openai },
     );
 
+    const id = crypto.randomUUID();
     deps.db
-      // generate the id (as uuid) and  insert it; ai!
-      .prepare("INSERT INTO services (name, url, data) VALUES (?, ?, ?)")
+      .prepare("INSERT INTO services (id, name, url, data) VALUES (?, ?, ?, ?)")
       .run(
+        id,
         service.name,
         service.url,
         JSON.stringify(
