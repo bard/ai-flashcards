@@ -113,23 +113,6 @@ const ensureDatabaseTables = (db: sqlite.Database): void => {
   ).run();
 };
 
-// move to a new src/etl/util.ts module ai!
-
-const fetchPageContentWithPlaywright = async (
-  browser: playwright.Browser,
-  url: string,
-): Promise<string> => {
-  const page = await browser.newPage();
-  await page.setExtraHTTPHeaders({
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9",
-  });
-  await page.goto(url, { waitUntil: "domcontentloaded" });
-  const content = await page.content();
-  return content;
-};
-
 const filterOutExistingServiceLinks = (
   serviceLinks: ServiceLink[],
   deps: { db: sqlite.Database; logger?: { info: (message: string) => void } },
