@@ -10,6 +10,7 @@ import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
   extractTaaftTrendingServices,
+  generateQuestionAnswerPair,
 } from "./operations.js";
 import { fetchPageContentWithPlaywright } from "./util.js";
 
@@ -21,7 +22,7 @@ const main = async (): Promise<void> => {
   const browser = await playwright.chromium.connect("ws://127.0.0.1:4000/");
   const db = new sqlite("data.db");
   await createOrUpdateDatabase(
-    { maxServicesToScrape: 3 },
+    { maxServicesToScrape: 4 },
     { browser, db, openai, logger },
   );
   await browser.close();
@@ -53,26 +54,53 @@ export const createOrUpdateDatabase = async (
   });
 
   for (const serviceLink of newServiceLinks.slice(0, maxServicesToScrape)) {
-    deps.logger?.info(
-      `fetching and extracting information for ${serviceLink.href}`,
-    );
-
     // slow down to avoid abusing upstream
     await sleep(Math.floor(Math.random() * 2000) + 2000);
 
+    deps.logger?.info(`fetching information for ${serviceLink.href}`);
     const { descriptions, tags } = await extractTaaftServiceBasicInfo(
       await fetchPageContentWithPlaywright(deps.browser, serviceLink.href),
     );
+
+    deps.logger?.info(`extracting features for ${serviceLink.href}`);
     const { goals, methods, fields } = await extractServiceFeaturesWithLlm(
       { descriptions, tags },
       { openai: deps.openai },
     );
 
-    const id = crypto.randomUUID();
-    deps.db
-      .prepare("INSERT INTO services (id, url, data) VALUES (?, ?, ?)")
-      .run(
-        id,
+    const serviceId = crypto.randomUUID();
+    const flashcards = await Promise.all(
+      ["goals", "fields", "methods"].map(async (feature) => {
+        const qaPair = await generateQuestionAnswerPair({
+          service: {
+            ...serviceLink,
+            descriptions,
+            tags,
+            fields,
+            goals,
+            methods,
+          },
+          featureToAskAbout: feature,
+        });
+        return {
+          id: crypto.randomUUID(),
+          question: qaPair.question,
+          answer: qaPair.answer,
+          feature,
+          service_id: serviceId,
+        };
+      }),
+    );
+
+    const insertServiceStmt = deps.db.prepare(
+      "INSERT INTO services (id, url, data) VALUES (?, ?, ?)",
+    );
+    const insertFlashcardStmt = deps.db.prepare(
+      "INSERT INTO flashcards (id, question, answer, feature, service_id) VALUES (?, ?, ?, ?, ?)",
+    );
+    const insertTransaction = deps.db.transaction(() => {
+      insertServiceStmt.run(
+        serviceId,
         serviceLink.href,
         JSON.stringify(
           {
@@ -88,41 +116,19 @@ export const createOrUpdateDatabase = async (
         ),
       );
 
-      const features = ["goals", "fields", "methods"] as const;
-      const flashcards = await Promise.all(
-        features.map(async (feature) => {
-          const qaPair = await generateQuestionAnswerPair({
-            service: { descriptions, tags, fields, goals, methods },
-            featureToAskAbout: feature,
-          });
-          return {
-            id: crypto.randomUUID(),
-            question: qaPair.question,
-            answer: qaPair.answer,
-            feature,
-            service_id: id,
-          };
-        })
-      );
+      for (const flashcard of flashcards) {
+        insertFlashcardStmt.run(
+          flashcard.id,
+          flashcard.question,
+          flashcard.answer,
+          flashcard.feature,
+          flashcard.service_id,
+        );
+      }
+    });
 
-      const insertFlashcard = deps.db.prepare(
-        "INSERT INTO flashcards (id, question, answer, feature, service_id) VALUES (?, ?, ?, ?, ?)"
-      );
-
-      const insertTransaction = deps.db.transaction((flashcards) => {
-        for (const flashcard of flashcards) {
-          insertFlashcard.run(
-            flashcard.id,
-            flashcard.question,
-            flashcard.answer,
-            flashcard.feature,
-            flashcard.service_id
-          );
-        }
-      });
-
-      insertTransaction(flashcards);
-    }
+    insertTransaction();
+  }
 };
 
 const ensureDatabaseTables = (db: sqlite.Database): void => {
@@ -167,7 +173,7 @@ const filterOutExistingServiceLinks = (
 
   if (existingServicesUrls.length > 0) {
     deps.logger?.info(
-      `information for ${existingServicesUrls.length} already exists in database, not scraping`,
+      `skipping fetching information for ${existingServicesUrls.length} services (already in db)`,
     );
   }
   const newServices = serviceLinks.filter(
