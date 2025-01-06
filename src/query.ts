@@ -1,5 +1,6 @@
 import type { QuestionAnswerPair, Service } from "./types.js";
 
+// move to etl.ts ai!
 export const generateQuestionAnswerPair = async ({
   service,
   featureToAskAbout,
