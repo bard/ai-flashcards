@@ -3,9 +3,13 @@ import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
   extractTaaftTrendingServices,
+  generateQuestionAnswerPair,
 } from "./operations.js";
-import { generateQuestionAnswerPair } from "../query.js";
 import type { Service } from "../types.js";
+import {
+  getTaaftTrendingPageMockContent,
+  getTaaftServicePageMockContent,
+} from "./operations.test.fixtures/index.js";
 
 test("generate question/answer pair from service description", async () => {
   const service: Service = {
@@ -39,10 +43,6 @@ test("generate question/answer pair from service description", async () => {
       "Transform pet photos into artistic styles resembling disney-pixar animation, Provide a variety of styles for personalizing pet images, Facilitate the creation of personalized gifts from pet images",
   });
 });
-import {
-  getTaaftTrendingPageMockContent,
-  getTaaftServicePageMockContent,
-} from "./operations.test.fixtures/index.js";
 
 test("extract semistructured service information from content of service page on taaft.com", async () => {
   const content = await getTaaftServicePageMockContent();
