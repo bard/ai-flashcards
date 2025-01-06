@@ -88,8 +88,41 @@ export const createOrUpdateDatabase = async (
         ),
       );
 
-    // generate flashcards for this service using `generateQuestionAnswerPair` for each type of feature (goals, fields, methods) and add them to the flashcards table all together in a transaction ai!
-  }
+      const features = ["goals", "fields", "methods"] as const;
+      const flashcards = await Promise.all(
+        features.map(async (feature) => {
+          const qaPair = await generateQuestionAnswerPair({
+            service: { descriptions, tags, fields, goals, methods },
+            featureToAskAbout: feature,
+          });
+          return {
+            id: crypto.randomUUID(),
+            question: qaPair.question,
+            answer: qaPair.answer,
+            feature,
+            service_id: id,
+          };
+        })
+      );
+
+      const insertFlashcard = deps.db.prepare(
+        "INSERT INTO flashcards (id, question, answer, feature, service_id) VALUES (?, ?, ?, ?, ?)"
+      );
+
+      const insertTransaction = deps.db.transaction((flashcards) => {
+        for (const flashcard of flashcards) {
+          insertFlashcard.run(
+            flashcard.id,
+            flashcard.question,
+            flashcard.answer,
+            flashcard.feature,
+            flashcard.service_id
+          );
+        }
+      });
+
+      insertTransaction(flashcards);
+    }
 };
 
 const ensureDatabaseTables = (db: sqlite.Database): void => {
