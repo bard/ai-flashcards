@@ -120,33 +120,7 @@ export const createOrUpdateDatabase = async (
     logger?: { info: (message: string) => void };
   },
 ) => {
-  // move table setup to a function named `ensureDatabaseTables` ai!
-  deps.db
-    .prepare(
-      `
-      CREATE TABLE IF NOT EXISTS services (
-        id TEXT PRIMARY KEY,
-        url TEXT UNIQUE,
-        name TEXT,
-        data TEXT
-      );
-    `,
-    )
-    .run();
-
-  deps.db
-    .prepare(
-      `
-      CREATE TABLE IF NOT EXISTS flashcards (
-        id TEXT PRIMARY KEY,
-        question TEXT,
-        answer TEXT,
-        service_id TEXT,
-        FOREIGN KEY(service_id) REFERENCES services(id)
-      );
-    `,
-    )
-    .run();
+  ensureDatabaseTables(deps.db);
 
   deps.logger?.info("fetching theresanaiforthat.com trending page");
   const taaftTrendingPageContent = await fetchPageContentWithPlaywright(
