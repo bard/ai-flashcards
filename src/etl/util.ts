@@ -1,4 +1,4 @@
-import playwright from "playwright";
+import type playwright from "playwright";
 
 export const fetchPageContentWithPlaywright = async (
   browser: playwright.Browser,

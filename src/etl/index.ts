@@ -11,6 +11,7 @@ import {
   extractTaaftServiceBasicInfo,
   extractTaaftTrendingServices,
 } from "./operations.js";
+import { fetchPageContentWithPlaywright } from "./util.js";
 
 const TAAFT_TRENDING_PAGE_URL = "https://theresanaiforthat.com/trending/";
 
