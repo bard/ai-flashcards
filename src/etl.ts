@@ -131,7 +131,19 @@ export const buildServiceDatabase = async (
     )
     .run();
 
-  // create another table (if it doesn't exist) named 'flashcards', with each record being a question/answer pair; it should have a service_id foreign key to point to a record from the services table; it should have a text id primary key; ai!
+  deps.db
+    .prepare(
+      `
+      CREATE TABLE IF NOT EXISTS flashcards (
+        id TEXT PRIMARY KEY,
+        question TEXT,
+        answer TEXT,
+        service_id TEXT,
+        FOREIGN KEY(service_id) REFERENCES services(id)
+      );
+    `,
+    )
+    .run();
 
   const taaftTrendingPageContent = await fetchPageContentWithPlaywright(
     deps.browser,
