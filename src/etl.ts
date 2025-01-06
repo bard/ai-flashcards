@@ -113,9 +113,9 @@ export const extractExtendedServiceInfoWithLlm = async (
 
 export const createOrUpdateDatabase = async (
   {
-    maxServices,
+    maxServicesToScrape,
     onProgress,
-  }: { maxServices: number; onProgress?: (message: string) => void },
+  }: { maxServicesToScrape: number; onProgress?: (message: string) => void },
   deps: { browser: playwright.Browser; db: sqlite.Database; openai: OpenAI },
 ) => {
   deps.db
@@ -145,6 +145,7 @@ export const createOrUpdateDatabase = async (
     )
     .run();
 
+  onProgress?.("fetching theresanaiforthat.com trending page");
   const taaftTrendingPageContent = await fetchPageContentWithPlaywright(
     deps.browser,
     TAAFT_TRENDING_PAGE_URL,
@@ -152,35 +153,28 @@ export const createOrUpdateDatabase = async (
   const services = extractTaaftTrendingServices(taaftTrendingPageContent);
 
   const serviceUrls = services.map((service) => service.url);
-  const existingServices = deps.db
+  const existingServicesUrls = deps.db
     .prepare(
       `SELECT url FROM services WHERE url IN (${serviceUrls
         .map(() => "?")
         .join(", ")})`,
     )
-    .all(...serviceUrls);
-
-  const existingServiceUrls = new Set(
-    existingServices.map((service) => service.url),
+    .all(...serviceUrls)
+    .map((record) => z.object({ url: z.string() }).parse(record))
+    .map((service) => service.url);
+  const newServices = services.filter(
+    (service) => !existingServicesUrls.includes(service.url),
   );
 
-  let scrapesLeft = maxServices;
-  for (const service of services) {
+  onProgress?.(`scraping the following services: ${serviceUrls}`);
+
+  let scrapesLeft = maxServicesToScrape;
+  for (const service of newServices) {
     if (scrapesLeft === 0) {
       break;
     }
 
-    const existingService = deps.db
-      .prepare("SELECT 1 FROM services WHERE url = ?")
-      .get(service.url);
-    if (existingService !== undefined && existingService !== null) {
-      onProgress?.(
-        `not scraping since already in db: ${service.name} at ${service.url}`,
-      );
-      continue;
-    } else {
-      onProgress?.(`scraping: ${service.name} at ${service.url}`);
-    }
+    onProgress?.(`scraping: ${service.name} at ${service.url}`);
 
     const delay = Math.floor(Math.random() * 2000) + 2000;
     await new Promise((resolve) => setTimeout(resolve, delay));

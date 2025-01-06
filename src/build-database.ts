@@ -9,7 +9,7 @@ const browser = await playwright.chromium.connect("ws://127.0.0.1:4000/");
 const db = new sqlite("data.db");
 await createOrUpdateDatabase(
   {
-    maxServices: 3,
+    maxServicesToScrape: 3,
     onProgress(message) {
       console.log(message);
     },
