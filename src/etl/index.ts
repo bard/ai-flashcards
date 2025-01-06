@@ -2,10 +2,12 @@ import { z } from "zod";
 import sleep from "sleep-promise";
 import { pino, type Logger } from "pino";
 import playwright from "playwright";
-import sqlite from "better-sqlite3";
+import { Kysely, SqliteDialect } from 'kysely';
+import sqlite3 from 'sqlite3';
 import { OpenAI } from "openai";
 import { fileURLToPath } from "node:url";
 import type { ServiceLink } from "../types.js";
+import { Database } from '../db/schema';
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
@@ -16,11 +18,16 @@ import { fetchPageContentWithPlaywright } from "./util.js";
 
 const TAAFT_TRENDING_PAGE_URL = "https://theresanaiforthat.com/trending/";
 
+const db = new Kysely<Database>({
+  dialect: new SqliteDialect({
+    database: new sqlite3.Database('data.db'),
+  }),
+});
+
 const main = async (): Promise<void> => {
   const logger = pino();
   const openai = new OpenAI();
   const browser = await playwright.chromium.connect("ws://127.0.0.1:4000/");
-  const db = new sqlite("data.db");
   await createOrUpdateDatabase(
     { maxServicesToScrape: 4 },
     { browser, db, openai, logger },
@@ -92,68 +99,38 @@ export const createOrUpdateDatabase = async (
       }),
     );
 
-    const insertServiceStmt = deps.db.prepare(
-      "INSERT INTO services (id, url, data) VALUES (?, ?, ?)",
-    );
-    const insertFlashcardStmt = deps.db.prepare(
-      "INSERT INTO flashcards (id, question, answer, feature, service_id) VALUES (?, ?, ?, ?, ?)",
-    );
-    const insertTransaction = deps.db.transaction(() => {
-      insertServiceStmt.run(
-        serviceId,
-        serviceLink.href,
-        JSON.stringify(
-          {
-            name: serviceLink.name,
-            descriptions,
-            tags,
-            fields,
-            goals,
-            methods,
-          },
-          null,
-          2,
-        ),
-      );
+    await insertService(serviceId, serviceLink, JSON.stringify({
+      name: serviceLink.name,
+      descriptions,
+      tags,
+      fields,
+      goals,
+      methods,
+    }, null, 2));
 
-      for (const flashcard of flashcards) {
-        insertFlashcardStmt.run(
-          flashcard.id,
-          flashcard.question,
-          flashcard.answer,
-          flashcard.feature,
-          flashcard.service_id,
-        );
-      }
-    });
-
-    insertTransaction();
+    await insertFlashcards(flashcards);
   }
 };
 
-const ensureDatabaseTables = (db: sqlite.Database): void => {
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS services (
-      id TEXT PRIMARY KEY,
-      url TEXT UNIQUE,
-      data TEXT
-    );
-  `,
-  ).run();
+const ensureDatabaseTables = async (): Promise<void> => {
+  await db.schema
+    .createTable('services')
+    .ifNotExists()
+    .addColumn('id', 'text', (col) => col.primaryKey())
+    .addColumn('url', 'text', (col) => col.unique())
+    .addColumn('data', 'text')
+    .execute();
 
-  db.prepare(
-    `
-    CREATE TABLE IF NOT EXISTS flashcards (
-      id TEXT PRIMARY KEY,
-      question TEXT,
-      answer TEXT,
-      feature TEXT,
-      service_id TEXT,
-      FOREIGN KEY(service_id) REFERENCES services(id)
-    );
-  `,
-  ).run();
+  await db.schema
+    .createTable('flashcards')
+    .ifNotExists()
+    .addColumn('id', 'text', (col) => col.primaryKey())
+    .addColumn('question', 'text')
+    .addColumn('answer', 'text')
+    .addColumn('feature', 'text')
+    .addColumn('service_id', 'text')
+    .addForeignKeyConstraint('fk_service_id', ['service_id'], 'services', ['id'])
+    .execute();
 };
 
 const filterOutExistingServiceLinks = (
@@ -182,6 +159,17 @@ const filterOutExistingServiceLinks = (
   return newServices;
 };
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+const insertService = async (serviceId: string, serviceLink: ServiceLink, data: string) => {
+  await db.insertInto('services').values({
+    id: serviceId,
+    url: serviceLink.href,
+    data,
+  }).execute();
+};
+
+const insertFlashcards = async (flashcards: FlashcardsTable[]) => {
+  await db.insertInto('flashcards').values(flashcards).execute();
+};
   await main();
+  await db.destroy();
 }
