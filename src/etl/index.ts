@@ -9,10 +9,10 @@ import type { Database } from "../db/schema.js";
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
-  extractTaaftTrendingServicesHrefs,
   generateQuestionAnswerPair,
 } from "./operations.js";
 import { fetchPageContentWithPlaywright } from "./util.js";
+import { extractTaaftTrendingServicesHrefs } from "./extract.js";
 
 const TAAFT_TRENDING_PAGE_URL = "https://theresanaiforthat.com/trending/";
 
