@@ -1,17 +1,53 @@
 import { z } from "zod";
 import type { OpenAI } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
-import * as cheerio from "cheerio";
 import type {
-  ServiceDescription,
+  Flashcard,
+  ExtendedServiceDescription,
+  ServiceBasicDescription,
   ServiceFeatures,
-  Service,
-  QuestionAnswerPair,
 } from "../types.js";
+import type { Logger } from "pino";
 
+export const generateFlashcards = async (
+  params: { service: ServiceBasicDescription },
+  deps: { openai: OpenAI; logger?: Logger },
+): Promise<Flashcard[]> => {
+  const { service } = params;
 
-export const extractServiceFeaturesWithLlm = async (
-  unstructuredServiceInfo: ServiceDescription,
+  deps.logger?.info(`inferring features for ${params.service.url}`);
+  const { goals, methods, fields } = await inferServiceFeaturesWithLlm(
+    service,
+    { openai: deps.openai },
+  );
+
+  return ["goals", "fields", "methods"].map((feature) => {
+    const { question, answer } = constructQuestionAnswerPair({
+      service: {
+        url: service.url,
+        name: service.name,
+        descriptions: service.descriptions,
+        tags: service.tags,
+        fields,
+        goals,
+        methods,
+      },
+      featureToAskAbout: feature,
+    });
+
+    return {
+      question,
+      answer,
+      extra: {
+        feature,
+        descriptions: service.descriptions,
+      },
+    };
+  });
+};
+
+export const inferServiceFeaturesWithLlm = async (
+  unstructuredServiceInfo: ServiceBasicDescription,
   deps: { openai: OpenAI },
 ): Promise<ServiceFeatures> => {
   const SYSTEM_PROMPT =
@@ -72,13 +108,13 @@ export const extractServiceFeaturesWithLlm = async (
   }
 };
 
-export const generateQuestionAnswerPair = async ({
+export const constructQuestionAnswerPair = ({
   service,
   featureToAskAbout,
 }: {
-  service: Service;
+  service: ExtendedServiceDescription;
   featureToAskAbout: string;
-}): Promise<QuestionAnswerPair> => {
+}): { question: string; answer: string } => {
   const { fields, methods, goals } = service;
   let question: string;
   let answer: string;
