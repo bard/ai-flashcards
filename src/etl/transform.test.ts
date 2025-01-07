@@ -1,4 +1,6 @@
-//  add missing imports ai!
+import { generateQuestionAnswerPair } from "./extract.js";
+import type { Service } from "../types.js";
+
 test("generate question/answer pair from service description", async () => {
   const service: Service = {
     name: "Sketch2Photo AI",

@@ -1,7 +1,6 @@
 import { test, expect, vi } from "vitest";
-import { extractTaaftServiceBasicInfo } from "./extract.js";
+import { extractTaaftServiceBasicInfo, extractServiceFeaturesWithLlm } from "./extract.js";
 import { getTaaftServicePageMockContent } from "./operations.test.fixtures/index.js";
-import { extractServiceFeaturesWithLlm } from "./operations.js";
 
 test("extract semistructured service information from content of service page on taaft.com", async () => {
   const content = await getTaaftServicePageMockContent();
