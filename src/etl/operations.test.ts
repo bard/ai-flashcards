@@ -2,7 +2,8 @@ import { test, expect, vi } from "vitest";
 import {
   extractServiceFeaturesWithLlm,
   generateQuestionAnswerPair,
-} from "./operations.js";
+  extractTaaftServiceBasicInfo,
+} from "./extract.js";
 import type { Service } from "../types.js";
 import { getTaaftServicePageMockContent } from "./operations.test.fixtures/index.js";
 
