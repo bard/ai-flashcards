@@ -14,13 +14,7 @@ export interface ServiceFeatures {
 export type ExtendedServiceDescription = ServiceBasicDescription &
   ServiceFeatures;
 
-export interface QuestionAnswerPair {
-  question: string;
-  answer: string;
-}
-
 export interface Flashcard {
   question: string;
   answer: string;
-  extra: any;
 }

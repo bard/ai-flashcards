@@ -21,33 +21,16 @@ export const generateFlashcards = async (
     { openai: deps.openai },
   );
 
-  return ["goals", "fields", "methods"].map((feature) => {
-    const { question, answer } = constructQuestionAnswerPair({
-      service: {
-        url: service.url,
-        name: service.name,
-        descriptions: service.descriptions,
-        tags: service.tags,
-        fields,
-        goals,
-        methods,
-      },
+  return (["goals", "fields", "methods"] as const).map((feature) =>
+    constructQuestionAnswerPair({
+      service: { ...service, fields, goals, methods },
       featureToAskAbout: feature,
-    });
-
-    return {
-      question,
-      answer,
-      extra: {
-        feature,
-        descriptions: service.descriptions,
-      },
-    };
-  });
+    }),
+  );
 };
 
 export const inferServiceFeaturesWithLlm = async (
-  unstructuredServiceInfo: ServiceBasicDescription,
+  serviceDescription: ServiceBasicDescription,
   deps: { openai: OpenAI },
 ): Promise<ServiceFeatures> => {
   const SYSTEM_PROMPT =
@@ -79,7 +62,7 @@ export const inferServiceFeaturesWithLlm = async (
     "Real-time AI-powered rendering for rapid image transformation"
   ]
 }`;
-  const PROMPT = JSON.stringify(unstructuredServiceInfo);
+  const PROMPT = JSON.stringify(serviceDescription);
 
   const llmResponse = await deps.openai.beta.chat.completions.parse({
     model: "gpt-4o-2024-08-06",
@@ -95,16 +78,15 @@ export const inferServiceFeaturesWithLlm = async (
         fields: z.array(z.string()),
         goals: z.array(z.string()),
       }),
-      "extended_service_info",
+      "service_features",
     ),
   });
 
   const response = llmResponse.choices[0].message.parsed;
   if (response === null) {
-    throw new Error("nothing");
+    throw new Error("no llm response returned");
   } else {
-    const { methods, goals, fields } = response;
-    return { methods, goals, fields };
+    return response;
   }
 };
 
@@ -113,35 +95,30 @@ export const constructQuestionAnswerPair = ({
   featureToAskAbout,
 }: {
   service: ExtendedServiceDescription;
-  featureToAskAbout: string;
+  featureToAskAbout: "goals" | "methods" | "fields";
 }): { question: string; answer: string } => {
   const { fields, methods, goals } = service;
   let question: string;
   let answer: string;
+
   switch (featureToAskAbout) {
     case "methods": {
-      question = `A service operating in the fields of ${fields.join(", ")}\n`;
-      question += `What AI-based methods could it use to accomplish these goals: ${methods.join(", ")}`;
-      answer = goals.join(", ");
+      question = `A service operates in the fields of ${fields.join(", ")}. It pursues these goals: ${goals.join(" ")}. What AI-based methods do you think it's using?`;
+      answer = methods.join(", ");
       break;
     }
     case "fields": {
-      question = `A service is using these AI-based methods: ${methods.join(", ")} \n`;
-      question += `In pursuit of the following goals: ${goals.join(", ")}\n`;
-      question += `In what fields is it operating?`;
+      question = `A service pursue the following goals: ${goals.join(", ")}. It uses these AI-based methods: ${methods.join(", ")}. What fields do you think it operates in?`;
       answer = fields.join(", ");
       break;
     }
     case "goals": {
-      question = `A service operating in the fields of ${fields.join(", ")} `;
-      question += `is using these AI-based methods: ${methods.join(", ")}. `;
-      question += `What goals do you think it is trying to accomplish?`;
+      question = `A service operates in the fields of ${fields.join(", ")}. It uses these AI-based methods: ${methods.join(", ")}. What goals do you think it is pursuing?`;
       answer = goals.join(", ");
       break;
     }
-    default:
-      throw new Error(`Invalid ask: ${featureToAskAbout}`);
   }
 
-  return { question, answer };
+  const note = `<a href="${service.url}" target="_blank">${service.name}</a> ${service.descriptions.join(" ")}`;
+  return { question, answer: answer + "\n" + note };
 };

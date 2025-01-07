@@ -71,7 +71,7 @@ describe("interactive development", () => {
       ],
     };
 
-    const qaPair = await constructQuestionAnswerPair({
+    const qaPair = constructQuestionAnswerPair({
       service,
       featureToAskAbout: "goals",
     });
