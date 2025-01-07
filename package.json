@@ -41,6 +41,7 @@
     "node": ">=22.5"
   },
   "dependencies": {
+    "@fast-csv/format": "^5.0.2",
     "better-sqlite3": "^11.7.0",
     "cheerio": "^1.0.0",
     "debug": "^4.4.0",
