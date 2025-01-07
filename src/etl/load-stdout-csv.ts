@@ -5,6 +5,12 @@ export class StdoutCSVLoader implements Loader {
   async setup() {}
 
   async load(flashcards: Flashcard[]): Promise<void> {
-    // implement ai!
+    const header = "question,answer\n";
+    process.stdout.write(header);
+
+    for (const flashcard of flashcards) {
+      const csvLine = `"${flashcard.question.replace(/"/g, '""')}","${flashcard.answer.replace(/"/g, '""')}"\n`;
+      process.stdout.write(csvLine);
+    }
   }
 }
