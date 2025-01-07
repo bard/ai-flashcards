@@ -1,17 +1,18 @@
+import { format } from "@fast-csv/format";
 import type { Flashcard } from "../types.js";
 import type { Loader } from "./types.js";
 
 export class StdoutCSVLoader implements Loader {
   async setup() {}
 
-  // use @fast-csv/format library instead ai!
   async load(flashcards: Flashcard[]): Promise<void> {
-    const header = "question,answer\n";
-    process.stdout.write(header);
+    const csvStream = format({ headers: ["question", "answer"] });
+    csvStream.pipe(process.stdout).on("end", () => process.exit());
 
     for (const flashcard of flashcards) {
-      const csvLine = `"${flashcard.question.replace(/"/g, '""')}","${flashcard.answer.replace(/"/g, '""')}"\n`;
+      csvStream.write({ question: flashcard.question, answer: flashcard.answer });
       process.stdout.write(csvLine);
     }
+    csvStream.end();
   }
 }
