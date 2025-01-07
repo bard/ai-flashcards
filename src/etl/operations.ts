@@ -27,6 +27,7 @@ export const extractTaaftServiceBasicInfo = async (
   return { name, tags, descriptions: [description] };
 };
 
+// move to src/etl/extract.ts ai!
 export const extractTaaftTrendingServicesHrefs = (
   taaftTrendingPageContent: string,
 ): string[] => {
