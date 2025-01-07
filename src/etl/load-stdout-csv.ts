@@ -4,6 +4,7 @@ import type { Loader } from "./types.js";
 export class StdoutCSVLoader implements Loader {
   async setup() {}
 
+  // use @fast-csv/format library instead ai!
   async load(flashcards: Flashcard[]): Promise<void> {
     const header = "question,answer\n";
     process.stdout.write(header);
