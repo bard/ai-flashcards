@@ -9,6 +9,7 @@ import type {
   QuestionAnswerPair,
 } from "../types.js";
 
+// move to src/etl/extract.ts ai!
 export const extractTaaftServiceBasicInfo = async (
   taaftServicePageContent: string,
 ): Promise<ServiceDescription> => {
@@ -26,7 +27,6 @@ export const extractTaaftServiceBasicInfo = async (
 
   return { name, tags, descriptions: [description] };
 };
-
 
 export const extractServiceFeaturesWithLlm = async (
   unstructuredServiceInfo: ServiceDescription,

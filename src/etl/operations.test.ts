@@ -2,14 +2,10 @@ import { test, expect, vi } from "vitest";
 import {
   extractServiceFeaturesWithLlm,
   extractTaaftServiceBasicInfo,
-  extractTaaftTrendingServicesHrefs,
   generateQuestionAnswerPair,
 } from "./operations.js";
 import type { Service } from "../types.js";
-import {
-  getTaaftTrendingPageMockContent,
-  getTaaftServicePageMockContent,
-} from "./operations.test.fixtures/index.js";
+import { getTaaftServicePageMockContent } from "./operations.test.fixtures/index.js";
 
 test("generate question/answer pair from service description", async () => {
   const service: Service = {
@@ -64,22 +60,6 @@ test("extract semistructured service information from content of service page on
         "Social Media Tool",
       ],
     }
-  `);
-});
-
-test("extract list of trending services from content of taaft.com trending page", async () => {
-  const content = await getTaaftTrendingPageMockContent();
-
-  const services = extractTaaftTrendingServicesHrefs(content);
-
-  expect(services.slice(0, 5)).toMatchInlineSnapshot(`
-    [
-      "/ai/magic-avatars/",
-      "/ai/goenhance/",
-      "/ai/twain/",
-      "/ai/kaiber/",
-      "/ai/learn-earth/",
-    ]
   `);
 });
 
