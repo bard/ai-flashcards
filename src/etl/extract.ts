@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import type playwright from "playwright";
+import type { ServiceDescription } from "../types.js";
 
 export const extractTaaftTrendingServicesHrefs = (
   taaftTrendingPageContent: string,
