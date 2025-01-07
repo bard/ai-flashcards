@@ -5,7 +5,6 @@ import sqlite from "better-sqlite3";
 import { OpenAI } from "openai";
 import { fileURLToPath } from "node:url";
 import type { Database } from "../db/schema.js";
-import { createOrUpdateDatabase } from "./load.js";
 
 export const TAAFT_TRENDING_PAGE_URL =
   "https://theresanaiforthat.com/trending/";
