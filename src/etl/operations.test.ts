@@ -1,7 +1,6 @@
 import { test, expect, vi } from "vitest";
 import {
   extractServiceFeaturesWithLlm,
-  extractTaaftServiceBasicInfo,
   generateQuestionAnswerPair,
 } from "./operations.js";
 import type { Service } from "../types.js";

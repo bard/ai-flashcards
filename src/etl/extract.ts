@@ -32,3 +32,21 @@ export const fetchPageContentWithPlaywright = async (
   const content = await page.content();
   return content;
 };
+
+export const extractTaaftServiceBasicInfo = async (
+  taaftServicePageContent: string,
+): Promise<ServiceDescription> => {
+  const $ = cheerio.load(taaftServicePageContent);
+
+  const name = $(".title_inner").text();
+
+  const description = $(".description").first().find("p").text().trim();
+
+  const tags: string[] = [];
+  $(".tags .tag:not(.price)").each((_, el) => {
+    const tag = $(el).text().trim();
+    tags.push(tag);
+  });
+
+  return { name, tags, descriptions: [description] };
+};

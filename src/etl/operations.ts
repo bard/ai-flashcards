@@ -9,24 +9,6 @@ import type {
   QuestionAnswerPair,
 } from "../types.js";
 
-// move to src/etl/extract.ts ai!
-export const extractTaaftServiceBasicInfo = async (
-  taaftServicePageContent: string,
-): Promise<ServiceDescription> => {
-  const $ = cheerio.load(taaftServicePageContent);
-
-  const name = $(".title_inner").text();
-
-  const description = $(".description").first().find("p").text().trim();
-
-  const tags: string[] = [];
-  $(".tags .tag:not(.price)").each((_, el) => {
-    const tag = $(el).text().trim();
-    tags.push(tag);
-  });
-
-  return { name, tags, descriptions: [description] };
-};
 
 export const extractServiceFeaturesWithLlm = async (
   unstructuredServiceInfo: ServiceDescription,
