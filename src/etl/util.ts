@@ -1,5 +1,6 @@
 import type playwright from "playwright";
 
+// move to src/etl/extract.ts ai!
 export const fetchPageContentWithPlaywright = async (
   browser: playwright.Browser,
   url: string,
