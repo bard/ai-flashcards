@@ -2,7 +2,7 @@ import { format } from "@fast-csv/format";
 import type { Flashcard } from "../types.js";
 import type { Loader } from "./types.js";
 // use node: scheme when importing ai!
-import fs from "fs";
+import fs from "node:fs";
 
 export class FileCsvLoader implements Loader {
   private filePath: string;
