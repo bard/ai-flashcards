@@ -49,7 +49,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       break;
     }
     case "file-csv": {
-      loader = new FileCsvLoader(config.LOAD_TARGET);
+      loader = new FileCsvLoader({ filePath: config.LOAD_TARGET, logger });
       break;
     }
   }

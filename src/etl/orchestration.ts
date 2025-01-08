@@ -23,20 +23,17 @@ export const performEtl = async (
 
   for (const serviceUrl of taafTrendingServicesUrls) {
     // extract
-    deps.logger?.info(`fetching information for ${serviceUrl}`);
     const serviceInfo = await deps.extractor.fetchTaaftServiceInfo({
       serviceUrl,
     });
 
     // transform
-    deps.logger?.info(`generating flashcards for ${serviceUrl}`);
     const flashcards = await generateFlashcards(
       { service: serviceInfo },
       { openai: deps.openai, logger: deps.logger },
     );
 
     // load
-    deps.logger?.info(`loading flashcards for ${serviceUrl}`);
     await deps.loader.load(flashcards);
   }
 };

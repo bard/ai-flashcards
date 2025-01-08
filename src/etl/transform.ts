@@ -13,6 +13,7 @@ export const generateFlashcards = async (
   params: { service: ServiceBasicDescription },
   deps: { openai: OpenAI; logger?: Logger },
 ): Promise<Flashcard[]> => {
+  deps.logger?.info(`generating flashcards for ${params.service.url}`);
   const { service } = params;
 
   deps.logger?.info(`inferring features for ${params.service.url}`);
