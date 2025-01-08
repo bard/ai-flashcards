@@ -6,7 +6,6 @@ import type { Extractor, Loader } from "./types.js";
 export const performEtl = async (
   params: {
     maxServicesToScrape: number;
-    urlsToSkip: string[];
   },
   deps: {
     logger: Logger;
@@ -20,7 +19,6 @@ export const performEtl = async (
   const taafTrendingServicesUrls =
     await deps.extractor.fetchTaaftTrendingServicesUrls({
       limit: params.maxServicesToScrape,
-      urlsToSkip: params.urlsToSkip,
     });
 
   for (const serviceUrl of taafTrendingServicesUrls) {

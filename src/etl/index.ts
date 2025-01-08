@@ -55,7 +55,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
 
   await performEtl(
-    { maxServicesToScrape: 2, urlsToSkip: [] },
+    { maxServicesToScrape: 2 },
     { extractor, loader, openai, logger },
   );
 }
