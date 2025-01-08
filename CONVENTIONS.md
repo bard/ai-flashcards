@@ -1,2 +1,4 @@
 - specify return type in function declarations
 - prefer const format for defining functions
+- prefer double quotes for strings
+- in conditionals, prefer explicit to implicit comparisons (e.g. `if (foo !== null)` rather than `if (!foo)`)
