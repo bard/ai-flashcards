@@ -46,6 +46,10 @@ export const extractTaaftTrendingServicesHrefsFromHtml = (
 ): string[] => {
   const $ = cheerio.load(taaftTrendingPageContent);
 
+  if ($("title").text() === "Just a moment...") {
+    throw new Error("Got cloudflare screen instead of trending page");
+  }
+
   const hrefs: string[] = [];
 
   $("a.ai_link").each((_, element) => {
