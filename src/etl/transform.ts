@@ -35,7 +35,7 @@ export const inferServiceFeaturesWithLlm = async (
   deps: { openai: OpenAI },
 ): Promise<ServiceFeatures> => {
   const SYSTEM_PROMPT =
-    "You are an assistant that, given information about online services that use AI-based methods, extracts information such as the service's goals, what fields it operates in, and what AI-based methods it uses in pursuit of the goals.";
+    "You are an assistant that, given information about an online service that use AI-based methods, extracts extracts the service's goals (up to 3), the fields it operates in (up to 3), and what AI-based methods (up to 3) it uses in pursuit of the goals .";
   const ONE_SHOT_EXAMPLE_PROMPT = `{
   "description": "Sketch2Photo AI is a cutting-edge online platform that transforms your hand-drawn sketches into stunning, photorealistic images using advanced artificial intelligence. Whether you’re a professional designer, an aspiring artist, or someone with a creative idea, Sketch2Photo AI brings your imagination to life with precision and realism. Simply upload your sketch, and our AI-powered service enhances it with realistic textures, colors, and details, turning your vision into reality in seconds.",
   "tags": [
