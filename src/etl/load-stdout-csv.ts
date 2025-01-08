@@ -14,6 +14,7 @@ export class FileCsvLoader implements Loader {
   }
 
   async setup() {
+    // use async version ai!
     if (fs.existsSync(this.filePath)) {
       fs.truncateSync(this.filePath);
     }
