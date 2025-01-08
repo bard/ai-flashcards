@@ -3,7 +3,7 @@ import type { OpenAI } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type { Logger } from "pino";
 import getUrls from "get-urls";
-import type { ServiceBasicDescription } from "../types.js";
+import type { BasicServiceInfo } from "../types.js";
 import type { Extractor } from "./types.js";
 
 export const TAAFT_TRENDING_PAGE_URL =
@@ -42,7 +42,7 @@ export class JinaOpenaiExtractor implements Extractor {
 
   async fetchTaaftServiceInfo(params: {
     serviceUrl: string;
-  }): Promise<ServiceBasicDescription> {
+  }): Promise<BasicServiceInfo> {
     this.logger?.info(`fetching information for ${params.serviceUrl}`);
 
     const res = await this.fetch("https://r.jina.ai/" + params.serviceUrl);

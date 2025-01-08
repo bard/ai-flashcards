@@ -3,10 +3,10 @@ import {
   inferServiceFeaturesWithLlm,
   constructQuestionAnswerPair,
 } from "./transform.js";
-import type { ExtendedServiceDescription } from "../types.js";
+import type { FullServiceInfo } from "../types.js";
 
 test("construct question/answer pair from extended service description", async () => {
-  const service: ExtendedServiceDescription = {
+  const service: FullServiceInfo = {
     name: "Sketch2Photo AI",
     url: "https://sketch2photo.ai",
     descriptions: [

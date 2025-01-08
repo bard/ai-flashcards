@@ -3,14 +3,14 @@ import type { OpenAI } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type {
   Flashcard,
-  ExtendedServiceDescription,
-  ServiceBasicDescription,
+  FullServiceInfo,
+  BasicServiceInfo,
   ServiceFeatures,
 } from "../types.js";
 import type { Logger } from "pino";
 
 export const generateFlashcards = async (
-  params: { service: ServiceBasicDescription },
+  params: { service: BasicServiceInfo },
   deps: { openai: OpenAI; logger?: Logger },
 ): Promise<Flashcard[]> => {
   deps.logger?.info(`generating flashcards for ${params.service.url}`);
@@ -31,7 +31,7 @@ export const generateFlashcards = async (
 };
 
 export const inferServiceFeaturesWithLlm = async (
-  serviceDescription: ServiceBasicDescription,
+  serviceDescription: BasicServiceInfo,
   deps: { openai: OpenAI },
 ): Promise<ServiceFeatures> => {
   const SYSTEM_PROMPT =
@@ -95,7 +95,7 @@ export const constructQuestionAnswerPair = ({
   service,
   featureToAskAbout,
 }: {
-  service: ExtendedServiceDescription;
+  service: FullServiceInfo;
   featureToAskAbout: "goals" | "methods" | "fields";
 }): { question: string; answer: string } => {
   const { fields, methods, goals } = service;

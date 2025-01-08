@@ -1,4 +1,4 @@
-export interface ServiceBasicDescription {
+export interface BasicServiceInfo {
   name: string;
   url: string;
   descriptions: string[];
@@ -11,8 +11,7 @@ export interface ServiceFeatures {
   fields: string[];
 }
 
-export type ExtendedServiceDescription = ServiceBasicDescription &
-  ServiceFeatures;
+export type FullServiceInfo = BasicServiceInfo & ServiceFeatures;
 
 export interface Flashcard {
   question: string;

@@ -1,7 +1,7 @@
 import type { Logger } from "pino";
 import * as cheerio from "cheerio";
 import type playwright from "playwright";
-import type { ServiceBasicDescription } from "../types.js";
+import type { BasicServiceInfo } from "../types.js";
 import type { Extractor } from "./types.js";
 
 export const TAAFT_TRENDING_PAGE_URL =
@@ -38,7 +38,7 @@ export class PlaywrightExtractor implements Extractor {
 
   async fetchTaaftServiceInfo(params: {
     serviceUrl: string;
-  }): Promise<ServiceBasicDescription> {
+  }): Promise<BasicServiceInfo> {
     this.logger?.info(`fetching information for ${params.serviceUrl}`);
     return extractTaaftServiceBasicInfoFromHtml(
       await fetchPageContentWithPlaywright(params.serviceUrl, {
@@ -88,7 +88,7 @@ export const fetchPageContentWithPlaywright = async (
 
 export const extractTaaftServiceBasicInfoFromHtml = async (
   taaftServicePageContent: string,
-): Promise<ServiceBasicDescription> => {
+): Promise<BasicServiceInfo> => {
   const $ = cheerio.load(taaftServicePageContent);
 
   const name = $(".title_inner").text();

@@ -1,4 +1,4 @@
-import type { Flashcard, ServiceBasicDescription } from "../types.js";
+import type { Flashcard, BasicServiceInfo } from "../types.js";
 
 export interface Loader {
   setup(): Promise<void>;
@@ -9,5 +9,5 @@ export interface Extractor {
   fetchTaaftTrendingServicesUrls(params: { limit: number }): Promise<string[]>;
   fetchTaaftServiceInfo(params: {
     serviceUrl: string;
-  }): Promise<ServiceBasicDescription>;
+  }): Promise<BasicServiceInfo>;
 }
