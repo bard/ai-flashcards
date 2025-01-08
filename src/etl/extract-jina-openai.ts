@@ -26,6 +26,7 @@ export class JinaOpenaiExtractor implements Extractor {
 
   async fetchTaaftTrendingServicesUrls(params: {
     limit: number;
+    // drop parameter ai!
     urlsToSkip?: string[];
   }): Promise<string[]> {
     this.logger?.info(
