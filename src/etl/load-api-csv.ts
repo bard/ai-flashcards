@@ -2,6 +2,7 @@ import type { Flashcard } from "../types.js";
 import type { Loader } from "./types.js";
 
 import { format } from "@fast-csv/format";
+// drop node-fetch import, we're using built-in fetch ai!
 import fetch from "node-fetch";
 
 export class ApiCsvLoader implements Loader {
