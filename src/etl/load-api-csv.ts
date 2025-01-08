@@ -17,6 +17,7 @@ export class ApiCsvLoader implements Loader {
     const csvStream = format({ headers: ["question", "answer"] });
     const csvData: string[] = [];
 
+    // use a promise to encapsulate the entire csv formatting process and return a string into a variable; then post using fetch; ai!
     csvStream.on("data", (chunk) => csvData.push(chunk.toString()));
     csvStream.on("end", async () => {
       const csvString = csvData.join("");
