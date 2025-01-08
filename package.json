@@ -13,8 +13,7 @@
     "typecheck:watch": "tsc --noEmit --watch",
     "start:playwright": "docker run --name playwright-server -p 4000:4000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.49.1-noble /bin/sh -c \"npx -y playwright@1.49.1 run-server --port 4000 --host 0.0.0.0\"",
     "stop:playwright": "docker kill playwright-server",
-    "etl:run:jina-openai:file-csv": "tsx src/etl/run-jina-openai_to_file-csv.ts | pino-pretty",
-    "etl:run:playwright:api-csv": "tsx src/etl/run-jina-playwright_to_api-csv.ts | pino-pretty"
+    "etl:run": "tsx src/etl/index.ts | pino-pretty"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

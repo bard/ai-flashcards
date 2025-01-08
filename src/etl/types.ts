@@ -14,3 +14,11 @@ export interface Extractor {
     serviceUrl: string;
   }): Promise<ServiceBasicDescription>;
 }
+
+export interface Config {
+  openAiApiKey: string;
+  maxServicesToScrape: number;
+  extractor: "jina-openai" | "playwright";
+  loader: "file-csv" | "api-csv";
+  loadTarget: string;
+}
