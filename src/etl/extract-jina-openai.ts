@@ -26,8 +26,6 @@ export class JinaOpenaiExtractor implements Extractor {
 
   async fetchTaaftTrendingServicesUrls(params: {
     limit: number;
-    // drop parameter ai!
-    urlsToSkip?: string[];
   }): Promise<string[]> {
     this.logger?.info(
       "fetching trending services on theresanaiforthat.com using reader.jina.ai",
@@ -39,11 +37,6 @@ export class JinaOpenaiExtractor implements Extractor {
     const text = await res.text();
     return Array.from(getUrls(text))
       .filter((url) => new URL(url).pathname.startsWith("/ai/"))
-      .filter((url) =>
-        params.urlsToSkip !== undefined
-          ? !params.urlsToSkip.includes(url)
-          : true,
-      )
       .slice(0, params.limit);
   }
 
