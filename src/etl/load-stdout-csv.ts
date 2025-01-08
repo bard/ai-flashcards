@@ -14,7 +14,9 @@ export class FileCsvLoader implements Loader {
   }
 
   async setup() {
-    // if filepath exists, truncate it ai!
+    if (fs.existsSync(this.filePath)) {
+      fs.truncateSync(this.filePath);
+    }
   }
 
   load(flashcards: Flashcard[]): Promise<void> {
@@ -24,8 +26,7 @@ export class FileCsvLoader implements Loader {
 
     const csvStream = format({ headers: ["question", "answer"] });
     return new Promise<void>((resolve, reject) => {
-      // create stream in append mode ai!
-      const writeStream = fs.createWriteStream(this.filePath);
+      const writeStream = fs.createWriteStream(this.filePath, { flags: "a" });
 
       csvStream
         .pipe(writeStream)
