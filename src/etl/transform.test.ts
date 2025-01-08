@@ -30,10 +30,21 @@ test("construct question/answer pair from extended service description", async (
     featureToAskAbout: "goals",
   });
 
-  expect(question).toMatchInlineSnapshot(`"A service operates in the fields of Pet imagery, Digital Art, Personalized Gift Creation. It uses these AI-based methods: Image style transfer using neural networks, AI-based image processing for style conversion. What goals do you think it is pursuing?"`);
+  expect(question).toMatchInlineSnapshot(`
+    "<p>A service operates in these fields:</p>
+    <ul><li>Pet imagery</li>
+    <li>Digital Art</li>
+    <li>Personalized Gift Creation</li></ul>
+    <p>It uses these AI-based methods:</p>
+    <ul><li>Image style transfer using neural networks</li>
+    <li>AI-based image processing for style conversion</li></ul>
+    <p>What goals do you think it pursues?</p>"
+  `);
   expect(answer).toMatchInlineSnapshot(`
-    "Transform pet photos into artistic styles resembling disney-pixar animation, Provide a variety of styles for personalizing pet images, Facilitate the creation of personalized gifts from pet images
-    <a href="https://sketch2photo.ai" target="_blank">Sketch2Photo AI</a> Turn you pet photos into cool disney-pixar animation like art or choose from many other styles. Then easily turn these images into personalised gifts for you, your friends or loved ones!"
+    "<ul><li>Transform pet photos into artistic styles resembling disney-pixar animation</li>
+    <li>Provide a variety of styles for personalizing pet images</li>
+    <li>Facilitate the creation of personalized gifts from pet images</li></ul>
+    <p><a href="https://sketch2photo.ai" target="_blank">Sketch2Photo AI</a> Turn you pet photos into cool disney-pixar animation like art or choose from many other styles. Then easily turn these images into personalised gifts for you, your friends or loved ones!</p>"
   `);
 });
 

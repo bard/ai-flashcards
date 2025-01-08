@@ -102,9 +102,9 @@ export const constructQuestionAnswerPair = ({
   let question: string;
   let answer: string;
 
-  const fieldList = `<ul>${fields.map((f) => "<li>" + f + "</li>")}</ul>`;
-  const goalList = `<ul>${goals.map((g) => "<li>" + g + "</li>")}</ul>`;
-  const methodList = `<ul>${methods.map((m) => "<li>" + m + "</li>")}</ul>`;
+  const fieldList = `<ul>${fields.map((f) => "<li>" + f + "</li>").join("\n")}</ul>`;
+  const goalList = `<ul>${goals.map((g) => "<li>" + g + "</li>").join("\n")}</ul>`;
+  const methodList = `<ul>${methods.map((m) => "<li>" + m + "</li>").join("\n")}</ul>`;
 
   switch (featureToAskAbout) {
     case "methods": {
@@ -122,7 +122,7 @@ ${goalList}
 <p>It uses these AI-based methods:</p>
 ${methodList}
 <p>What fields do you think it operates in?</p>`;
-      answer = fields.join(", ");
+      answer = fieldList;
       break;
     }
     case "goals": {
