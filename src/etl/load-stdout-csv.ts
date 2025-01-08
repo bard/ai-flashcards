@@ -2,6 +2,7 @@ import { format } from "@fast-csv/format";
 import type { Flashcard } from "../types.js";
 import type { Loader } from "./types.js";
 
+// rename to FileCsvLoader and output to a file configured via constructor instead of stdout ai!
 export class StdoutCsvLoader implements Loader {
   async setup() {}
 
