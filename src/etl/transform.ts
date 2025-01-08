@@ -101,24 +101,40 @@ export const constructQuestionAnswerPair = ({
   let question: string;
   let answer: string;
 
+  const fieldList = `<ul>${fields.map((f) => "<li>" + f + "</li>")}</ul>`;
+  const goalList = `<ul>${goals.map((g) => "<li>" + g + "</li>")}</ul>`;
+  const methodList = `<ul>${methods.map((m) => "<li>" + m + "</li>")}</ul>`;
+
   switch (featureToAskAbout) {
     case "methods": {
-      question = `A service operates in the fields of ${fields.join(", ")}. It pursues these goals: ${goals.join(" ")}. What AI-based methods do you think it's using?`;
-      answer = methods.join(", ");
+      question = `<p>A service operates in these fields:</p>
+${fieldList}
+<p>It pursues these goals:</p>
+${goalList}
+<p>What AI-based methods do you think it's using?</p>`;
+      answer = methodList;
       break;
     }
     case "fields": {
-      question = `A service pursue the following goals: ${goals.join(", ")}. It uses these AI-based methods: ${methods.join(", ")}. What fields do you think it operates in?`;
+      question = `<p>A service pursues these goals:</p>
+${goalList}
+<p>It uses these AI-based methods:</p>
+${methodList}
+<p>What fields do you think it operates in?</p>`;
       answer = fields.join(", ");
       break;
     }
     case "goals": {
-      question = `A service operates in the fields of ${fields.join(", ")}. It uses these AI-based methods: ${methods.join(", ")}. What goals do you think it is pursuing?`;
-      answer = goals.join(", ");
+      question = `<p>A service operates in these fields:</p>
+${fieldList}
+<p>It uses these AI-based methods:</p>
+${methodList}
+<p>What goals do you think it pursues?</p>`;
+      answer = goalList;
       break;
     }
   }
 
-  const note = `<a href="${service.url}" target="_blank">${service.name}</a> ${service.descriptions.join(" ")}`;
+  const note = `<p><a href="${service.url}" target="_blank">${service.name}</a> ${service.descriptions.join(" ")}</p>`;
   return { question, answer: answer + "\n" + note };
 };
