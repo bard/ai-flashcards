@@ -18,8 +18,6 @@ export class PlaywrightExtractor implements Extractor {
 
   async fetchTaaftTrendingServicesUrls(params: {
     limit: number;
-    // drop parameter ai!
-    urlsToSkip?: string[];
   }): Promise<string[]> {
     this.logger?.info(
       "fetching trending services on theresanaiforthat.com using playwright",
@@ -35,13 +33,7 @@ export class PlaywrightExtractor implements Extractor {
       (href) => new URL(href, TAAFT_TRENDING_PAGE_URL).href,
     );
 
-    return taaftServicesUrls
-      .filter((url) =>
-        params.urlsToSkip !== undefined
-          ? !params.urlsToSkip.includes(url)
-          : true,
-      )
-      .slice(0, params.limit);
+    return taaftServicesUrls.slice(0, params.limit);
   }
 
   async fetchTaaftServiceInfo(params: {
