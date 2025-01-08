@@ -5,9 +5,14 @@ import { format } from "@fast-csv/format";
 
 export class ApiCsvLoader implements Loader {
   private apiEndpoint: string;
+  private requestHeaders: Record<string, string>;
 
-  constructor(apiEndpoint: string) {
-    this.apiEndpoint = apiEndpoint;
+  constructor(params: {
+    apiEndpoint: string;
+    requestHeaders?: Record<string, string>;
+  }) {
+    this.apiEndpoint = params.apiEndpoint;
+    this.requestHeaders = params.requestHeaders ?? {};
   }
 
   async setup() {}
@@ -31,6 +36,7 @@ export class ApiCsvLoader implements Loader {
       method: "POST",
       headers: {
         "Content-Type": "text/csv",
+        ...this.requestHeaders,
       },
       body: csvString,
     });

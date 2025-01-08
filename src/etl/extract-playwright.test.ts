@@ -1,9 +1,9 @@
 import { expect } from "vitest";
-import { test } from "./fixtures/index.js";
+import { test } from "./extract-playwright.test.fixtures/index.js";
 import {
   extractTaaftServiceBasicInfoFromHtml,
   extractTaaftTrendingServicesHrefsFromHtml,
-} from "./extract.js";
+} from "./extract-playwright.js";
 
 test("extract list of trending services from content of taaft.com trending page", async ({
   taaftTrendingPageContent,
