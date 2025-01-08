@@ -44,7 +44,9 @@ test("construct question/answer pair from extended service description", async (
     "<ul><li>Transform pet photos into artistic styles resembling disney-pixar animation</li>
     <li>Provide a variety of styles for personalizing pet images</li>
     <li>Facilitate the creation of personalized gifts from pet images</li></ul>
-    <p><a href="https://sketch2photo.ai" target="_blank">Sketch2Photo AI</a> Turn you pet photos into cool disney-pixar animation like art or choose from many other styles. Then easily turn these images into personalised gifts for you, your friends or loved ones!</p>"
+    <hr/>
+    <h2><a href="https://sketch2photo.ai" target="_blank">Sketch2Photo AI</a></h2>
+    <p>Turn you pet photos into cool disney-pixar animation like art or choose from many other styles. Then easily turn these images into personalised gifts for you, your friends or loved ones!</p>"
   `);
 });
 
