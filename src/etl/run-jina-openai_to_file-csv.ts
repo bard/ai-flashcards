@@ -12,13 +12,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const extractor = new JinaOpenaiExtractor({ logger, openai, fetch });
   const loader = new FileCsvLoader("/tmp/flashcards.csv");
 
-  // const db = new Kysely<Database>({
-  //   dialect: new SqliteDialect({
-  //     database: new sqlite("data.db"),
-  //   }),
-  // });
-  // const loader = new DatabaseLoader(db);
-
   await performEtl(
     { maxServicesToScrape: 2, urlsToSkip: [] },
     { extractor, loader, openai, logger },
