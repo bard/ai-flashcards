@@ -6,18 +6,8 @@ export interface Loader {
 }
 
 export interface Extractor {
-  fetchTaaftTrendingServicesUrls(params: {
-    limit: number;
-  }): Promise<string[]>;
+  fetchTaaftTrendingServicesUrls(params: { limit: number }): Promise<string[]>;
   fetchTaaftServiceInfo(params: {
     serviceUrl: string;
   }): Promise<ServiceBasicDescription>;
-}
-
-export interface Config {
-  openAiApiKey: string;
-  maxServicesToScrape: number;
-  extractor: "jina-openai" | "playwright";
-  loader: "file-csv" | "api-csv";
-  loadTarget: string;
 }

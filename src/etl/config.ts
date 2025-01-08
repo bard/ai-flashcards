@@ -1,23 +1,28 @@
 import { z } from "zod";
-import type { Config } from "./types.js";
+
+const ENV_SCHEMA = z
+  .object({
+    OPENAI_API_KEY: z.string(),
+    MAX_SERVICES_TO_SCRAPE: z.coerce.number(),
+    EXTRACTOR: z.union([z.literal("jina-openai"), z.literal("playwright")]),
+  })
+  .and(
+    z
+      .object({
+        LOADER: z.literal("api-csv"),
+        API_SECRET: z.string(),
+        LOAD_TARGET: z.string().url(),
+      })
+      .or(
+        z.object({
+          LOADER: z.literal("file-csv"),
+          LOAD_TARGET: z.string(),
+        }),
+      ),
+  );
+
+export type Config = z.TypeOf<typeof ENV_SCHEMA>;
 
 export const parseEnvConfig = (env: NodeJS.ProcessEnv): Config => {
-  const envSchema = z.object({
-    OPENAI_API_KEY: z.string(),
-    MAX_SERVICES: z.number(),
-    EXTRACTOR: z.union([z.literal("jina-openai"), z.literal("playwright")]),
-    LOADER: z.union([z.literal("file-csv"), z.literal("api-csv")]),
-    LOAD_TARGET: z.string(),
-    API_SECRET: z.string().optional(),
-  });
-
-  const parsedEnv = envSchema.parse(env);
-
-  return {
-    openAiApiKey: parsedEnv.OPENAI_API_KEY,
-    maxServicesToScrape: parsedEnv.MAX_SERVICES,
-    extractor: parsedEnv.EXTRACTOR,
-    loader: parsedEnv.LOADER,
-    loadTarget: parsedEnv.LOAD_TARGET,
-  };
+  return ENV_SCHEMA.parse(env);
 };

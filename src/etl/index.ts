@@ -6,8 +6,8 @@ import { FileCsvLoader } from "./load-stdout-csv.js";
 import { JinaOpenaiExtractor } from "./extract-jina-openai.js";
 import { PlaywrightExtractor } from "./extract-playwright.js";
 import { performEtl } from "./orchestration.js";
-import { parseEnvConfig } from "./config.js";
-import type { Config, Extractor, Loader } from "./types.js";
+import { type Config, parseEnvConfig } from "./config.js";
+import type { Extractor, Loader } from "./types.js";
 import { ApiCsvLoader } from "./load-api-csv.js";
 import { ZodError } from "zod";
 
@@ -24,10 +24,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1);
   }
 
-  const openai = new OpenAI({ apiKey: config.openAiApiKey });
+  const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
 
   let extractor: Extractor;
-  switch (config.extractor) {
+  switch (config.EXTRACTOR) {
     case "jina-openai": {
       extractor = new JinaOpenaiExtractor({ logger, openai, fetch });
       break;
@@ -40,22 +40,22 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
 
   let loader: Loader;
-  switch (config.loader) {
+  switch (config.LOADER) {
     case "api-csv": {
       loader = new ApiCsvLoader({
-        apiEndpoint: "http://localhost:3000/api/admin/db/load",
-        requestHeaders: { "x-api-key": "secret" },
+        apiEndpoint: config.LOAD_TARGET,
+        requestHeaders: { "x-api-key": config.API_SECRET },
       });
       break;
     }
     case "file-csv": {
-      loader = new FileCsvLoader("/tmp/flashcards.csv");
+      loader = new FileCsvLoader(config.LOAD_TARGET);
       break;
     }
   }
 
   await performEtl(
-    { maxServicesToScrape: 2 },
+    { maxServicesToScrape: config.MAX_SERVICES_TO_SCRAPE },
     { extractor, loader, openai, logger },
   );
 }
