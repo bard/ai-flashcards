@@ -53,7 +53,8 @@ export class JinaOpenaiExtractor implements Extractor {
     const PROMPT = text;
 
     const llmResponse = await this.openai.beta.chat.completions.parse({
-      model: "gpt-4o-2024-08-06",
+      model: "gpt-4o-mini-2024-07-18",
+      //      model: "gpt-4o-2024-08-06",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: PROMPT },
