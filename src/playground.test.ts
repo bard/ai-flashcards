@@ -1,12 +1,8 @@
-import type { Logger } from "pino";
 import { describe } from "vitest";
 import { test } from "./playground.test.fixtures.js";
 import { inferServiceFeaturesWithLlm } from "./etl/transform.js";
 import { constructQuestionAnswerPair } from "./etl/transform.js";
-import { performEtl } from "./etl/orchestration.js";
-import { DatabaseLoader } from "./etl/load-db.js";
 import { JinaOpenaiExtractor } from "./etl/extract-jina-openai.js";
-import { PlaywrightExtractor } from "./etl/extract-playwright.js";
 
 describe("interactive development", () => {
   test.skip(
@@ -18,23 +14,6 @@ describe("interactive development", () => {
         serviceUrl: "https://theresanaiforthat.com/ai/coderabbit",
       });
       console.log(info);
-    },
-  );
-
-  test.skip(
-    "build database",
-    { timeout: 20000 },
-    async ({ db, browser, openai }) => {
-      const extractor = new PlaywrightExtractor({ browser });
-      const loader = new DatabaseLoader(db);
-
-      await performEtl(
-        { maxServicesToScrape: 2, urlsToSkip: [] },
-        { extractor, loader, openai, logger: { info: console.info } as Logger },
-      );
-
-      const rows = await db.selectFrom("services").selectAll().execute();
-      console.log(rows);
     },
   );
 

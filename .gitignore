@@ -8,4 +8,4 @@ dist
 /coverage
 .aider*
 !.aider.conf.yml
-data.db
+
