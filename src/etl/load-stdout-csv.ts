@@ -15,11 +15,8 @@ export class FileCsvLoader implements Loader {
 
   async setup() {
     try {
-      await fs.promises.access(this.filePath);
       await fs.promises.truncate(this.filePath);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-    }
+    } catch (_err) {}
   }
 
   load(flashcards: Flashcard[]): Promise<void> {
