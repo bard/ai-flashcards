@@ -8,6 +8,7 @@ export interface Loader {
 export interface Extractor {
   fetchTaaftTrendingServicesUrls(params: {
     limit: number;
+    // drop paramater ai!
     urlsToSkip?: string[];
   }): Promise<string[]>;
   fetchTaaftServiceInfo(params: {
