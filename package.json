@@ -1,6 +1,5 @@
 {
-  "name": "intuicards",
-  "private": true,
+  "name": "ai-flashcards",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
