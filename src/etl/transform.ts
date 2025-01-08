@@ -112,7 +112,7 @@ export const constructQuestionAnswerPair = ({
 ${fieldList}
 <p>It pursues these goals:</p>
 ${goalList}
-<p>What AI-based methods do you think it's using?</p>`;
+<p>What AI-based methods do you think it’s using?</p>`;
       answer = methodList;
       break;
     }
@@ -136,6 +136,8 @@ ${methodList}
     }
   }
 
-  const note = `<p><a href="${service.url}" target="_blank">${service.name}</a> ${service.descriptions.join(" ")}</p>`;
+  const note = `<hr/>
+<h2><a href="${service.url}" target="_blank">${service.name}</a></h2>
+<p>${service.descriptions.join(" ")}</p>`;
   return { question, answer: answer + "\n" + note };
 };
