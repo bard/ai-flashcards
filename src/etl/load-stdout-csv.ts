@@ -14,9 +14,11 @@ export class FileCsvLoader implements Loader {
   }
 
   async setup() {
-    // use async version ai!
-    if (fs.existsSync(this.filePath)) {
-      fs.truncateSync(this.filePath);
+    try {
+      await fs.promises.access(this.filePath);
+      await fs.promises.truncate(this.filePath);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
     }
   }
 
