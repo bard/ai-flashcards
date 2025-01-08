@@ -1,6 +1,4 @@
-import type { Flashcard } from "../types.js";
-import type { Loader } from "./types.js";
-
+import type { Flashcard, Loader } from "./types.js";
 import { format } from "@fast-csv/format";
 
 export class ApiCsvLoader implements Loader {

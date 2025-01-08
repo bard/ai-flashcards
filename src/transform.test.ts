@@ -3,7 +3,7 @@ import {
   inferServiceFeaturesWithLlm,
   constructQuestionAnswerPair,
 } from "./transform.js";
-import type { FullServiceInfo } from "../types.js";
+import type { FullServiceInfo } from "./types.js";
 
 test("construct question/answer pair from extended service description", async () => {
   const service: FullServiceInfo = {

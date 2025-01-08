@@ -1,5 +1,4 @@
-import type { Flashcard } from "../types.js";
-import type { Loader } from "./types.js";
+import type { Flashcard, Loader } from "./types.js";
 
 export class StdoutNdjsonLoader implements Loader {
   async setup() {}

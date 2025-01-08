@@ -1,7 +1,7 @@
 import type { Logger } from "pino";
 import * as cheerio from "cheerio";
 import type playwright from "playwright";
-import type { BasicServiceInfo } from "../types.js";
+import type { BasicServiceInfo } from "./types.js";
 import type { Extractor } from "./types.js";
 
 export const TAAFT_TRENDING_PAGE_URL =

@@ -6,7 +6,7 @@ import type {
   FullServiceInfo,
   BasicServiceInfo,
   ServiceFeatures,
-} from "../types.js";
+} from "./types.js";
 import type { Logger } from "pino";
 
 export const generateFlashcards = async (

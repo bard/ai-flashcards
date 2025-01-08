@@ -3,7 +3,7 @@ import type { OpenAI } from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type { Logger } from "pino";
 import getUrls from "get-urls";
-import type { BasicServiceInfo } from "../types.js";
+import type { BasicServiceInfo } from "./types.js";
 import type { Extractor } from "./types.js";
 
 export const TAAFT_TRENDING_PAGE_URL =

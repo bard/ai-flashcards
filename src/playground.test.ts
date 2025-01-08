@@ -1,8 +1,10 @@
 import { describe } from "vitest";
 import { test } from "./playground.test.fixtures.js";
-import { inferServiceFeaturesWithLlm } from "./etl/transform.js";
-import { constructQuestionAnswerPair } from "./etl/transform.js";
-import { JinaOpenaiExtractor } from "./etl/extract-jina-openai.js";
+import {
+  inferServiceFeaturesWithLlm,
+  constructQuestionAnswerPair,
+} from "./transform.js";
+import { JinaOpenaiExtractor } from "./extract-jina-openai.js";
 
 describe("interactive development", () => {
   test.skip(

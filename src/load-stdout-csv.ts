@@ -1,8 +1,7 @@
+import fs from "node:fs";
 import { format } from "@fast-csv/format";
 import type { Logger } from "pino";
-import type { Flashcard } from "../types.js";
-import type { Loader } from "./types.js";
-import fs from "node:fs";
+import type { Flashcard, Loader } from "./types.js";
 
 export class FileCsvLoader implements Loader {
   private filePath: string;
