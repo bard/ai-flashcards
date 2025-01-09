@@ -12,6 +12,10 @@ The aim is to train your intuitions about use cases for AI in products and servi
 
 After generating the flashcards, you can import them in the companion app [simple-flashcards](http://github.com/bard/simple-flashcards) (see its [README](http://github.com/bard/simple-flashcards) for instructions) or in other flashcard applications that support CSV import, such as Anki.
 
+## Demo
+
+![](./demo.gif)
+
 ## Running
 
 ```sh
@@ -21,7 +25,7 @@ pnpm install
 
 export OPENAI_API_KEY=sk-proj-...
 export EXTRACTOR=jina-openai
-export MAX_SERVICES_TO_SCRAPE=2
+export MAX_SERVICES_TO_SCRAPE=5
 export LOADER=file-csv
 export LOAD_TARGET=/tmp/flashcards.csv
 pnpm etl:run
